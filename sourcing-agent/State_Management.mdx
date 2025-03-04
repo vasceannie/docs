@@ -1,0 +1,411 @@
+---
+title: 'State Management'
+description: 'Agent state tracking and data structure management'
+icon: 'database'
+---
+
+# State Management Module
+
+## Overview
+
+The State Management module (`src/agent/state.py`) provides the core data structures and functions for managing the agent's state throughout its execution. It defines how information is represented, validated, and transformed as it flows through the agent system's workflow.
+
+## Primary Responsibilities
+
+1. **State Definition**: Defining the data structures that represent agent state
+2. **State Initialization**: Creating properly structured initial states
+3. **State Validation**: Ensuring state data conforms to expected schemas
+4. **State Transformation**: Providing mechanisms to safely modify state
+5. **State Persistence**: Supporting serialization and deserialization
+
+## Core Components
+
+### AgentState Class
+
+The primary class representing the agent's state at any point in the workflow:
+
+```python
+class AgentState:
+    """Represents the complete state of an agent during execution.
+    
+    The AgentState class tracks all information about the agent's process,
+    including input data, intermediate results, and final outputs.
+    
+    Attributes:
+        category (str): The category or type of agent task
+        topics (List[Dict]): Information topics being processed
+        research_state (Dict): State of the research process
+        market_state (Dict): State of the market analysis process
+        validation_state (Dict): State of the validation process
+        errors (List[Dict]): Errors encountered during processing
+        metadata (Dict): Additional tracking information
+    """
+    
+    def __init__(
+        self,
+        category: str,
+        topics: Optional[List[Dict]] = None,
+        research_state: Optional[Dict] = None,
+        market_state: Optional[Dict] = None,
+        validation_state: Optional[Dict] = None,
+        errors: Optional[List[Dict]] = None,
+        metadata: Optional[Dict] = None
+    ):
+        """Initialize a new AgentState.
+        
+        Args:
+            category: The category or type of agent task
+            topics: Information topics being processed
+            research_state: State of the research process
+            market_state: State of the market analysis process
+            validation_state: State of the validation process
+            errors: Errors encountered during processing
+            metadata: Additional tracking information
+        """
+        self.category = category
+        self.topics = topics or []
+        self.research_state = research_state or {"completed": False, "results": {}}
+        self.market_state = market_state or {"completed": False, "results": {}}
+        self.validation_state = validation_state or {"completed": False, "results": {}}
+        self.errors = errors or []
+        self.metadata = metadata or {"created_at": datetime.now().isoformat()}
+```
+
+### State Initialization Functions
+
+Functions for creating new agent states with proper structure:
+
+```python
+def initialize_agent_state(
+    category: str,
+    config: Optional[Dict[str, Any]] = None
+) -> AgentState:
+    """Create a new agent state with the specified category and configuration.
+    
+    This function creates a properly structured initial state with default values
+    for all required fields. It ensures all nested dictionaries and lists are
+    properly initialized.
+    
+    Args:
+        category: The category or type of agent task
+        config: Optional configuration data to include in the state
+        
+    Returns:
+        AgentState: A new agent state instance
+    """
+    # Create basic state with required fields
+    state = AgentState(category=category)
+    
+    # Initialize metadata with timestamp and unique ID
+    state.metadata = {
+        "created_at": datetime.now().isoformat(),
+        "updated_at": datetime.now().isoformat(),
+        "id": str(uuid.uuid4()),
+        "source": "initialization"
+    }
+    
+    # Include any provided configuration
+    if config:
+        state.config = config
+        
+    return state
+```
+
+### State Validation Functions
+
+Functions for ensuring state data is valid and properly structured:
+
+```python
+def validate_agent_state(state: AgentState) -> Tuple[bool, List[str]]:
+    """Validate that the agent state has all required fields with proper types.
+    
+    This function checks that the state object has all required fields and that
+    they conform to the expected types and formats. It returns a tuple with a
+    boolean indicating if the state is valid and a list of error messages.
+    
+    Args:
+        state: The agent state to validate
+        
+    Returns:
+        Tuple[bool, List[str]]: (is_valid, error_messages)
+    """
+    errors = []
+    
+    # Check required string fields
+    if not isinstance(state.category, str):
+        errors.append(f"Category must be a string, got {type(state.category)}")
+        
+    # Check required list fields
+    if not isinstance(state.topics, list):
+        errors.append(f"Topics must be a list, got {type(state.topics)}")
+        
+    # Check required dictionary fields
+    for field_name in ["research_state", "market_state", "validation_state", "metadata"]:
+        field_value = getattr(state, field_name, None)
+        if not isinstance(field_value, dict):
+            errors.append(f"{field_name} must be a dictionary, got {type(field_value)}")
+    
+    return (len(errors) == 0, errors)
+```
+
+### State Transformation Functions
+
+Functions for safely modifying state data:
+
+```python
+def create_new_agent_state(state: AgentState) -> AgentState:
+    """Create a deep copy of the provided state to avoid modifying the original.
+    
+    This function creates a new AgentState instance with the same data as the
+    provided state, ensuring no references to the original state's mutable
+    objects are maintained.
+    
+    Args:
+        state: The agent state to copy
+        
+    Returns:
+        AgentState: A new agent state instance with the same data
+    """
+    # Create a new state instance
+    new_state = AgentState(category=state.category)
+    
+    # Copy all fields with deep copying for mutable objects
+    new_state.topics = copy.deepcopy(state.topics)
+    new_state.research_state = copy.deepcopy(state.research_state)
+    new_state.market_state = copy.deepcopy(state.market_state)
+    new_state.validation_state = copy.deepcopy(state.validation_state)
+    new_state.errors = copy.deepcopy(state.errors)
+    new_state.metadata = copy.deepcopy(state.metadata)
+    
+    # Update the timestamp to reflect the new copy
+    if new_state.metadata:
+        new_state.metadata["updated_at"] = datetime.now().isoformat()
+        
+    return new_state
+```
+
+### State Serialization
+
+Functions for converting state to and from serializable formats:
+
+```python
+def serialize_agent_state(state: AgentState) -> Dict[str, Any]:
+    """Convert an AgentState object to a serializable dictionary.
+    
+    This function creates a dictionary representation of the state that can be
+    serialized to JSON or other formats for storage or transmission.
+    
+    Args:
+        state: The agent state to serialize
+        
+    Returns:
+        Dict[str, Any]: A serializable dictionary representation of the state
+    """
+    return {
+        "category": state.category,
+        "topics": state.topics,
+        "research_state": state.research_state,
+        "market_state": state.market_state,
+        "validation_state": state.validation_state,
+        "errors": state.errors,
+        "metadata": state.metadata
+    }
+
+def deserialize_agent_state(data: Dict[str, Any]) -> AgentState:
+    """Create an AgentState object from a serialized dictionary.
+    
+    This function reconstructs an AgentState instance from a dictionary
+    representation, such as one created by serialize_agent_state().
+    
+    Args:
+        data: The serialized state data
+        
+    Returns:
+        AgentState: The reconstructed agent state
+    """
+    return AgentState(
+        category=data.get("category", "unknown"),
+        topics=data.get("topics", []),
+        research_state=data.get("research_state", {"completed": False, "results": {}}),
+        market_state=data.get("market_state", {"completed": False, "results": {}}),
+        validation_state=data.get("validation_state", {"completed": False, "results": {}}),
+        errors=data.get("errors", []),
+        metadata=data.get("metadata", {"created_at": datetime.now().isoformat()})
+    )
+```
+
+## State Structure
+
+The AgentState class organizes data into several key sections:
+
+### Core Properties
+
+| Property | Description | Type |
+|----------|-------------|------|
+| `category` | The category or type of agent task | string |
+| `topics` | Information topics being processed | List[Dict] |
+| `errors` | Errors encountered during processing | List[Dict] |
+| `metadata` | Tracking information like timestamps and IDs | Dict |
+
+### Process-Specific States
+
+| Property | Description | Type |
+|----------|-------------|------|
+| `research_state` | State of the research process | Dict |
+| `market_state` | State of the market analysis process | Dict |
+| `validation_state` | State of the validation process | Dict |
+
+### Topic Structure
+
+Each topic in the `topics` list follows this structure:
+
+```python
+{
+    "name": "topic_name",
+    "description": "Description of the topic",
+    "status": "pending|in_progress|completed|failed",
+    "priority": 1,
+    "data": {
+        # Topic-specific data
+    },
+    "research_results": {
+        # Results from research operations
+    },
+    "market_results": {
+        # Results from market analysis
+    },
+    "validation_results": {
+        # Results from validation
+    }
+}
+```
+
+### Error Structure
+
+Each error in the `errors` list follows this structure:
+
+```python
+{
+    "timestamp": "2023-01-01T12:00:00Z",
+    "node": "node_name",
+    "message": "Error message",
+    "details": {
+        # Error-specific details
+    },
+    "recovery_attempts": 1,
+    "resolved": False
+}
+```
+
+## Usage Examples
+
+### Creating a New State
+
+```python
+from agent.state import initialize_agent_state
+
+# Create a basic state
+state = initialize_agent_state(category="suppliers")
+
+# Create state with initial configuration
+state = initialize_agent_state(
+    category="market_research",
+    config={
+        "topic": "renewable energy",
+        "depth": "comprehensive",
+        "format": "report"
+    }
+)
+```
+
+### Modifying State Safely
+
+```python
+from agent.state import create_new_agent_state
+
+def update_research_results(state, topic_name, results):
+    """Update research results for a topic while maintaining immutability."""
+    # Create a new state to avoid modifying the original
+    new_state = create_new_agent_state(state)
+    
+    # Find the topic to update
+    for topic in new_state.topics:
+        if topic["name"] == topic_name:
+            # Update the topic's research results
+            topic["research_results"] = results
+            topic["status"] = "completed"
+            break
+            
+    # Update research state
+    new_state.research_state["completed"] = True
+    new_state.research_state["results"][topic_name] = results
+    
+    # Update metadata
+    new_state.metadata["updated_at"] = datetime.now().isoformat()
+    
+    return new_state
+```
+
+### Validating State
+
+```python
+from agent.state import validate_agent_state
+
+def process_state(state):
+    """Process a state after validating it."""
+    # Validate the state
+    is_valid, errors = validate_agent_state(state)
+    
+    if not is_valid:
+        # Handle validation errors
+        for error in errors:
+            logger.error(f"State validation error: {error}")
+        # Create a minimal valid state
+        return initialize_agent_state(category="error")
+        
+    # Process the valid state
+    # ...
+```
+
+### Serializing and Deserializing State
+
+```python
+from agent.state import serialize_agent_state, deserialize_agent_state
+import json
+
+def save_state_to_file(state, filename):
+    """Save state to a JSON file."""
+    # Serialize the state to a dictionary
+    state_dict = serialize_agent_state(state)
+    
+    # Write to file
+    with open(filename, 'w') as f:
+        json.dump(state_dict, f, indent=2)
+        
+def load_state_from_file(filename):
+    """Load state from a JSON file."""
+    # Read from file
+    with open(filename, 'r') as f:
+        state_dict = json.load(f)
+        
+    # Deserialize to an AgentState object
+    return deserialize_agent_state(state_dict)
+```
+
+## Best Practices
+
+1. **Immutability**: Always create new state objects rather than modifying existing ones
+2. **Validation**: Validate state objects before operating on them
+3. **Complete Data**: Ensure all required fields are present when creating or modifying state
+4. **Type Safety**: Maintain proper types for all state fields
+5. **Deep Copying**: Always use deep copying when duplicating mutable state components
+6. **Timestamp Tracking**: Update timestamps when modifying state to aid debugging
+7. **Error Tracking**: Record errors in the state for later analysis
+8. **Minimal Dependencies**: Keep the state module with minimal dependencies on other modules
+
+## Related Components
+
+- **Graph Engine**: Uses the state as the core data representation flowing through the graph
+- **Utility Functions**: Provide helpers for common state operations
+- **Node Functions**: Use and transform state as they execute
+- **API Layer**: Serializes and deserializes state for external interfaces 

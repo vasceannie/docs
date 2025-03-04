@@ -1,0 +1,75 @@
+---
+title: 'Core Modules'
+description: 'Essential system modules and components'
+icon: 'cube'
+---
+
+# Core Module
+
+This module provides the core components for building agent-based applications using a graph-based architecture, aligned with LangGraph's patterns.
+
+## Key Components
+
+### State Management
+
+- `State`: Base TypedDict class for state representation
+- `StateManager`: Manages state creation, validation, and merging
+- `MessageState`: Specialized state type for message-based interactions
+- Reducer functions: `default_reducer`, `add_to_list` for state updates
+
+### Graph Implementation
+
+- `GraphBuilder`: Builder for creating computation graphs
+- `Graph`: A computational graph for processing state through nodes
+- `START` and `END`: Constants for graph entry and exit points
+- Support for conditional edges and node transitions
+
+### Agent Interfaces
+
+- `AgentInterface`: Protocol defining required methods for agents
+- `BaseAgent`: Abstract base class for agent implementations
+- `RunnableAgent`: Agent implementation that wraps a LangChain Runnable
+- `FunctionAgent`: Agent implementation that wraps a function
+
+## LangGraph Alignment
+
+This implementation has been updated to align with LangGraph's architecture:
+
+1. **State Management**: Uses TypedDict with annotations for state definition, similar to LangGraph's approach.
+
+2. **Reducer Functions**: Supports reducer functions for state updates, allowing for specialized handling of state attributes.
+
+3. **Conditional Edges**: Supports conditional transitions between nodes based on state evaluation.
+
+4. **Compilation Step**: Includes a compilation step via the `compile()` method, matching LangGraph's pattern.
+
+5. **Entry and Exit Points**: Uses explicit entry and exit points for graph execution.
+
+6. **State Checkpointing**: Provides basic infrastructure for state checkpointing.
+
+## Usage Example
+
+See the `src/agent/examples/simple_graph.py` file for a complete example of how to use these components to build a simple conversational agent.
+
+```python
+# Create a graph builder
+builder = GraphBuilder(ConversationState)
+
+# Add nodes
+builder.add_node("user_input", user_input)
+builder.add_node("ai_response", ai_response)
+
+# Add edges
+builder.add_edge(START, "user_input")
+builder.add_edge("user_input", "ai_response")
+
+# Add conditional edge for looping
+builder.add_conditional_edge("ai_response", should_continue, "user_input")
+builder.add_edge("ai_response", END)
+
+# Set entry and finish points
+builder.set_entry_point("user_input")
+builder.set_finish_point("ai_response")
+
+# Build the graph
+graph = builder.compile()

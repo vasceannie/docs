@@ -1,0 +1,322 @@
+---
+title: 'Architecture Flows'
+description: 'Comprehensive flow diagrams of component interactions'
+icon: 'sitemap'
+---
+
+# Architecture Flows
+
+This document provides detailed flow diagrams illustrating the interactions, inputs/outputs, and dependencies for each component of the Agent System.
+
+## Table of Contents
+
+1. [Core Module Flows](#core-module-flows)
+   - [Graph Building and Execution Flow](#graph-building-and-execution-flow)
+   - [State Management Flow](#state-management-flow)
+   - [Agent Interface Flow](#agent-interface-flow)
+2. [Node Flows](#node-flows)
+   - [Main Node Flow](#main-node-flow)
+   - [Research Node Flow](#research-node-flow)
+   - [Error Handling Flow](#error-handling-flow)
+   - [Validation Node Flow](#validation-node-flow)
+3. [Tool Integration Flows](#tool-integration-flows)
+   - [Base Tool Execution Flow](#base-tool-execution-flow)
+   - [Evaluator Tool Flow](#evaluator-tool-flow)
+   - [Tool Registry Flow](#tool-registry-flow)
+4. [Cross-Module Flows](#cross-module-flows)
+   - [End-to-End Agent Execution](#end-to-end-agent-execution)
+   - [Error Handling and Recovery Across Modules](#error-handling-and-recovery-across-modules)
+   - [Tool to Node Integration Flow](#tool-to-node-integration-flow)
+
+## Core Module Flows
+
+This section shows the internal flows within each core module, illustrating how components within a module interact.
+
+### Graph Building and Execution Flow
+
+```mermaid
+flowchart TD
+    subgraph GraphBuilder
+        GB_Init["GraphBuilder.__init__()"]
+        GB_AddNode["add_node(node, name)"]
+        GB_AddEdge["add_edge(source, target, condition)"]
+        GB_Build["build()"]
+    end
+    
+    subgraph Graph
+        G_Init["Graph.__init__(nodes, edges)"]
+        G_Run["run(state)"]
+        G_ProcessNode["_process_node(node, state)"]
+        G_FindNextNode["_find_next_node(state, current)"]
+    end
+    
+    GB_Init --> GB_AddNode
+    GB_AddNode --> GB_AddEdge
+    GB_AddEdge --> GB_Build
+    GB_Build --> G_Init
+    G_Init --> G_Run
+    G_Run --> G_ProcessNode
+    G_ProcessNode --> G_FindNextNode
+    G_FindNextNode -->|Next node found| G_ProcessNode
+    G_FindNextNode -->|End condition met| G_Run
+```
+
+### State Management Flow
+
+```mermaid
+flowchart TD
+    subgraph StateCreation
+        SC_CreateState["State.create()"]
+        SC_Validation["_validate_input()"]
+        SC_Initialization["_initialize_state()"]
+    end
+    
+    subgraph StateTransformation
+        ST_UpdateState["state.update()"]
+        ST_MergeState["state.merge()"]
+        ST_ValidateUpdate["_validate_update()"]
+    end
+    
+    SC_CreateState --> SC_Validation
+    SC_Validation --> SC_Initialization
+    SC_Initialization --> State
+    
+    State --> ST_UpdateState
+    State --> ST_MergeState
+    ST_UpdateState --> ST_ValidateUpdate
+    ST_MergeState --> ST_ValidateUpdate
+    ST_ValidateUpdate --> State
+```
+
+### Agent Interface Flow
+
+```mermaid
+flowchart TD
+    subgraph AgentInterface
+        AI_Initialize["initialize()"]
+        AI_Process["process(inputs)"]
+        AI_GenerateResponse["generate_response()"]
+    end
+    
+    subgraph ConcreteAgent[Concrete Agent Implementation]
+        CA_Process["_process_implementation()"]
+        CA_Generate["_generation_implementation()"]
+    end
+    
+    AI_Initialize --> AI_Process
+    AI_Process --> CA_Process
+    CA_Process --> AI_GenerateResponse
+    AI_GenerateResponse --> CA_Generate
+```
+
+## Node Flows
+
+This section shows the internal flows within different node types, illustrating how nodes process states.
+
+### Main Node Flow
+
+The flow of the main node processing:
+
+```mermaid
+flowchart TD
+    State[Initial State] --> MainNode
+    MainNode -->|Research needed| ResearchNode
+    MainNode -->|Market analysis needed| MarketNode
+    MainNode -->|Data analysis needed| AnalysisNode
+    MainNode -->|Final output| Output[Final State]
+    
+    ResearchNode --> MainNode
+    MarketNode --> MainNode
+    AnalysisNode --> MainNode
+```
+
+### Research Node Flow
+
+The flow of the research node processing:
+
+```mermaid
+flowchart TD
+    Input[Input State] --> RN[Research Node]
+    
+    subgraph ResearchProcess
+        RN --> ST[Search Tool]
+        ST --> Extract[Extract Information]
+        Extract --> Format[Format Results]
+    end
+    
+    Format --> Validate[Validate Results]
+    Validate -->|Valid| Output[Output State with Research]
+    Validate -->|Invalid| RN
+```
+
+### Error Handling Flow
+
+```mermaid
+flowchart TD
+    Node[Any Node] -->|Error occurs| ErrorNode
+    
+    subgraph ErrorHandling
+        ErrorNode --> Detect[Detect Error Type]
+        Detect -->|Recoverable| Recovery[Recovery Strategy]
+        Detect -->|Non-recoverable| Terminate[Terminate Flow]
+        Recovery --> Retry[Retry Operation]
+    end
+    
+    Retry -->|Success| Continue[Continue Flow]
+    Retry -->|Failure| Escalate[Escalate Error]
+```
+
+### Validation Node Flow
+
+The flow of the validation node:
+
+```mermaid
+flowchart TD
+    Input[Input State] --> VN[Validation Node]
+    
+    subgraph ValidationProcess
+        VN --> Schema[Schema Validation]
+        Schema --> Content[Content Validation]
+        Content --> Quality[Quality Checks]
+    end
+    
+    Quality -->|Pass| Output[Valid Output State]
+    Quality -->|Fail| Reject[Reject State]
+    Reject --> ErrorNode
+```
+
+## Tool Integration Flows
+
+This section shows the internal flows within tool integrations, illustrating how tools are used in the agent system.
+
+### Base Tool Execution Flow
+
+```mermaid
+flowchart TD
+    subgraph ToolUsage
+        Init["Tool.__init__()"]
+        Run["tool.__call__(inputs)"]
+        Validate["_validate_inputs(inputs)"]
+        Execute["_run(validated_inputs)"]
+        Format["_format_result(result)"]
+    end
+    
+    Init --> Run
+    Run --> Validate
+    Validate -->|Valid| Execute
+    Validate -->|Invalid| Error[Raise Error]
+    Execute --> Format
+    Format --> Result[Return Result]
+```
+
+### Evaluator Tool Flow
+
+```mermaid
+flowchart TD
+    Input[Input Content] --> ET[Evaluator Tool]
+    
+    subgraph EvaluationProcess
+        ET --> Criteria[Apply Evaluation Criteria]
+        Criteria --> Calculate[Calculate Scores]
+        Calculate --> Feedback[Generate Feedback]
+    end
+    
+    Feedback --> Result[Evaluation Result]
+    Result -->|Pass| Continue[Continue Process]
+    Result -->|Fail| Improve[Suggest Improvements]
+```
+
+### Tool Registry Flow
+
+```mermaid
+flowchart TD
+    subgraph ToolRegistration
+        Register["ToolRegistry.register(tool)"]
+        GetTool["ToolRegistry.get_tool(name)"]
+        ListTools["ToolRegistry.list_tools()"]
+    end
+    
+    Tool[New Tool] --> Register
+    Register --> Registry[Tool Registry]
+    GetTool --> Registry
+    ListTools --> Registry
+    Registry --> AvailableTools[Available Tools]
+```
+
+## Cross-Module Flows
+
+This section illustrates how different modules interact with each other to accomplish system-level processes.
+
+### End-to-End Agent Execution
+
+```mermaid
+flowchart TD
+    Input[User Input] --> Config[Configuration Loading]
+    Config --> StateInit[State Initialization]
+    StateInit --> GraphInit[Graph Initialization]
+    
+    subgraph Execution
+        GraphInit --> MainNode
+        MainNode -->|Route to specialized node| SpecializedNode[Specialized Node]
+        SpecializedNode -->|Use tools if needed| Tools[Tool Execution]
+        Tools --> SpecializedNode
+        SpecializedNode --> MainNode
+    end
+    
+    MainNode -->|Final output| Output[Final Output]
+```
+
+### Error Handling and Recovery Across Modules
+
+```mermaid
+flowchart TD
+    subgraph NodeExecution
+        Node[Node Execution]
+    end
+    
+    subgraph ToolExecution
+        Tool[Tool Execution]
+    end
+    
+    subgraph ErrorHandling
+        ErrorNode[Error Node]
+        ErrorStrategy[Error Strategy]
+        Recovery[Recovery Mechanism]
+    end
+    
+    Node -->|Error| ErrorNode
+    Tool -->|Error| ErrorNode
+    ErrorNode --> ErrorStrategy
+    ErrorStrategy -->|Recoverable| Recovery
+    Recovery -->|Retry Node| Node
+    Recovery -->|Retry Tool| Tool
+    ErrorStrategy -->|Non-recoverable| Terminate[Terminate Process]
+```
+
+### Tool to Node Integration Flow
+
+```mermaid
+flowchart TD
+    subgraph NodeProcessing
+        Node[Node Processing]
+        StatePrep[Prepare State for Tool]
+        ResultProcess[Process Tool Results]
+    end
+    
+    subgraph ToolExecution
+        Init[Initialize Tool]
+        Validate[Validate Inputs]
+        Execute[Execute Tool Logic]
+        Format[Format Results]
+    end
+    
+    Node --> StatePrep
+    StatePrep --> Init
+    Init --> Validate
+    Validate --> Execute
+    Execute --> Format
+    Format --> ResultProcess
+    ResultProcess --> Node
+```
+
+This documentation provides a comprehensive view of the agent system architecture through visual flow diagrams. Each diagram illustrates the interactions between components, the flow of data, and the transformation of state throughout the system. 

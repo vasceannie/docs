@@ -1,0 +1,206 @@
+---
+title: 'Enhanced Retry Functionality'
+description: 'Advanced retry mechanisms and error handling'
+icon: 'rotate'
+---
+
+# Enhanced Retry Functionality
+
+This document describes the enhanced retry functionality available in the agent system, including timeout handling, callback tracking, and retry statistics.
+
+## Basic Usage
+
+The `async_retry` decorator provides robust retry capabilities for async functions:
+
+```python
+from agent.utils import async_retry
+
+@async_retry(max_retries=3, base_delay=1.0)
+async def my_flaky_function(arg1, arg2):
+    # This function will be retried up to 3 times
+    # with exponential backoff starting at 1 second
+    result = await some_external_api_call(arg1, arg2)
+    return result
+```
+
+## Timeout Support
+
+You can now specify a timeout for each individual attempt:
+
+```python
+@async_retry(max_retries=3, base_delay=1.0, timeout=5.0)
+async def my_function_with_timeout():
+    # Each attempt will timeout after 5 seconds
+    result = await potentially_slow_operation()
+    return result
+```
+
+This ensures that your function calls don't hang indefinitely, which is particularly important when dealing with external APIs that might not respond in a timely manner.
+
+## Callback Tracking
+
+The enhanced retry mechanism now supports callbacks when retries occur:
+
+```python
+def my_retry_handler(attempt, exception):
+    print(f"Attempt {attempt} failed with: {type(exception).__name__}: {str(exception)}")
+    # Log or track the retry...
+
+@async_retry(
+    max_retries=3, 
+    base_delay=1.0, 
+    on_retry=my_retry_handler
+)
+async def my_monitored_function():
+    # This function will invoke my_retry_handler on each retry
+    result = await some_operation()
+    return result
+```
+
+## Retry Statistics
+
+The system now includes a comprehensive retry statistics tracking module:
+
+```python
+from agent.retry_stats import create_retry_tracker, get_retry_stats
+
+# 1. Create a decorated function with statistics tracking
+@async_retry(
+    max_retries=3,
+    base_delay=1.0,
+    on_retry=create_retry_tracker("my_critical_function")
+)
+async def my_critical_function():
+    # Operations will be tracked
+    pass
+
+# 2. Call the function (potentially from multiple places)
+await my_critical_function()
+await my_critical_function()
+
+# 3. Get retry statistics
+stats = await get_retry_stats("my_critical_function")
+print(f"Success rate: {stats['success_rate']:.2%}")
+print(f"Average retries per call: {stats['avg_retries_per_call']:.2f}")
+print(f"Most common exceptions: {stats['exception_counts']}")
+```
+
+### Available Statistics
+
+The following statistics are available for each tracked function:
+
+- `total_calls`: Total number of calls to the function
+- `successful_calls`: Number of calls that eventually succeeded
+- `failed_calls`: Number of calls that failed even after retries
+- `retried_calls`: Number of calls that required at least one retry
+- `total_retries`: Total number of retries across all calls
+- `success_rate`: Percentage of calls that succeeded
+- `retry_rate`: Percentage of calls that required retries
+- `avg_retries_per_call`: Average number of retries per call
+- `avg_time_per_call`: Average time per call (including retries)
+- `exception_counts`: Counts of each type of exception encountered
+- `recent_events`: List of recent retry events with timing information
+
+### Resetting Statistics
+
+You can reset statistics for a specific function or all functions:
+
+```python
+from agent.retry_stats import reset_retry_stats
+
+# Reset stats for a specific function
+await reset_retry_stats("my_critical_function")
+
+# Reset all retry statistics
+await reset_retry_stats()
+```
+
+## Best Practices
+
+1. **Always set appropriate timeouts** for functions that call external services to prevent hanging operations.
+
+2. **Use specific exception types** in `retry_on` to only retry on expected transient failures:
+
+   ```python
+   @async_retry(
+       max_retries=3,
+       retry_on=(aiohttp.ClientError, asyncio.TimeoutError)
+   )
+   ```
+
+3. **Use the statistics tracking** for critical or problematic functions to identify patterns in failures.
+
+4. **Set reasonable backoff parameters** to prevent overwhelming services during recovery:
+   - `base_delay`: Starting delay between retries
+   - `max_delay`: Maximum delay between retries
+
+5. **Keep retry counts low** (2-3) for user-facing operations and higher (5+) for background tasks where latency is less critical.
+
+## Performance Considerations
+
+The enhanced retry functionality is designed to have minimal overhead:
+
+- Timeout handling uses asyncio's built-in mechanisms
+- The callback system only executes on retries, not on every call
+- Statistics tracking happens asynchronously to avoid blocking the main function
+
+## Examples
+
+### API Client with Retries and Monitoring
+
+```python
+from agent.utils import async_retry
+from agent.retry_stats import create_retry_tracker
+
+class APIClient:
+    def __init__(self, base_url):
+        self.base_url = base_url
+        self.session = None
+    
+    async def ensure_session(self):
+        if self.session is None or self.session.closed:
+            self.session = aiohttp.ClientSession()
+        return self.session
+    
+    @async_retry(
+        max_retries=3,
+        base_delay=1.0,
+        max_delay=10.0,
+        timeout=30.0,
+        retry_on=(aiohttp.ClientError, asyncio.TimeoutError),
+        on_retry=create_retry_tracker("api_client.get_data")
+    )
+    async def get_data(self, endpoint):
+        session = await self.ensure_session()
+        async with session.get(f"{self.base_url}/{endpoint}") as response:
+            response.raise_for_status()
+            return await response.json()
+```
+
+### Scheduled Monitoring
+
+```python
+from agent.retry_stats import get_retry_stats
+
+async def report_retry_metrics():
+    """Generate a report of retry statistics for monitoring."""
+    stats = await get_retry_stats()
+    
+    # Report critical functions with high retry rates
+    critical_functions = []
+    for func_name, func_stats in stats.items():
+        if func_stats["retry_rate"] > 0.1:  # More than 10% retried
+            critical_functions.append({
+                "function": func_name,
+                "retry_rate": func_stats["retry_rate"],
+                "success_rate": func_stats["success_rate"],
+                "avg_retries": func_stats["avg_retries_per_call"],
+                "exceptions": func_stats["exception_counts"]
+            })
+    
+    # Sort by retry rate (highest first)
+    critical_functions.sort(key=lambda x: x["retry_rate"], reverse=True)
+    
+    # Log or send to monitoring system
+    logger.warning(f"Functions with high retry rates: {critical_functions}")
+  

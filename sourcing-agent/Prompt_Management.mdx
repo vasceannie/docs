@@ -1,0 +1,449 @@
+---
+title: 'Prompt Management'
+description: 'Template management and LLM interaction patterns'
+icon: 'message'
+---
+
+# Prompt Management Module
+
+## Overview
+
+The Prompt Management module (`src/agent/prompts.py`) is responsible for defining, organizing, and managing the text templates used for communicating with language models. It ensures consistent and effective prompting across the agent system.
+
+## Primary Responsibilities
+
+1. **Prompt Definition**: Creating structured templates for various LLM interactions
+2. **Template Management**: Organizing templates for different agent functions
+3. **Prompt Rendering**: Converting templates to final prompts with context data
+4. **Prompt Versioning**: Managing changes to prompts over time
+5. **Context Management**: Handling the inclusion of relevant context in prompts
+
+## Core Components
+
+### Prompt Template System
+
+The system for defining and rendering prompt templates:
+
+```python
+class PromptTemplate:
+    """A template for generating prompts with variable substitution.
+    
+    This class represents a text template with placeholders that can be
+    filled with values to create a final prompt for the LLM.
+    
+    Attributes:
+        template (str): The template string with placeholders
+        required_variables (List[str]): Variables that must be provided
+        optional_variables (Dict[str, Any]): Variables with default values
+    """
+    
+    def __init__(
+        self,
+        template: str,
+        required_variables: Optional[List[str]] = None,
+        optional_variables: Optional[Dict[str, Any]] = None
+    ):
+        """Initialize a new prompt template.
+        
+        Args:
+            template: The template string with placeholders
+            required_variables: List of variables that must be provided
+            optional_variables: Dictionary of variables with default values
+        """
+        self.template = template
+        self.required_variables = required_variables or []
+        self.optional_variables = optional_variables or {}
+        
+        # Extract all variables from the template
+        self.all_variables = set(self.required_variables).union(set(self.optional_variables.keys()))
+        
+        # Validate that all required variables appear in the template
+        for var in self.required_variables:
+            if f"{{{var}}}" not in self.template:
+                raise ValueError(f"Required variable '{var}' not found in template")
+                
+    def render(self, **kwargs) -> str:
+        """Render the template with the provided variables.
+        
+        This method substitutes all placeholders in the template with
+        the provided values.
+        
+        Args:
+            **kwargs: The values for template variables
+            
+        Returns:
+            str: The fully rendered prompt
+            
+        Raises:
+            ValueError: If a required variable is missing
+        """
+        # Check for missing required variables
+        for var in self.required_variables:
+            if var not in kwargs:
+                raise ValueError(f"Required variable '{var}' not provided")
+                
+        # Combine provided values with defaults for optional variables
+        variables = {**self.optional_variables, **kwargs}
+        
+        # Render the template
+        try:
+            return self.template.format(**variables)
+        except KeyError as e:
+            raise ValueError(f"Variable '{e}' referenced in template but not provided")
+```
+
+### System Message Templates
+
+Templates for system messages that define the agent's behavior:
+
+```python
+SYSTEM_PROMPT = PromptTemplate(
+    template="""You are an AI assistant specialized in {domain} research and analysis.
+Your task is to {task} with a focus on providing accurate, relevant, and comprehensive information.
+
+Follow these guidelines:
+1. Be thorough and detailed in your research
+2. Focus on factual information from reliable sources
+3. Organize information in a clear, structured format
+4. Cite sources when possible
+5. Acknowledge limitations or uncertainties in the data
+
+{additional_instructions}
+""",
+    required_variables=["domain", "task"],
+    optional_variables={"additional_instructions": ""}
+)
+
+RESEARCH_SYSTEM_PROMPT = PromptTemplate(
+    template="""You are a research assistant specializing in gathering information on {topic}.
+Your goal is to collect relevant, accurate data from various sources to provide a comprehensive
+understanding of the topic.
+
+For this research task:
+- Focus on: {focus_areas}
+- Consider aspects such as: {aspects}
+- Prioritize information from: {source_priorities}
+
+{specific_guidelines}
+""",
+    required_variables=["topic", "focus_areas", "aspects", "source_priorities"],
+    optional_variables={"specific_guidelines": ""}
+)
+```
+
+### Task-Specific Prompts
+
+Templates for various specific agent tasks:
+
+```python
+TOPIC_ANALYSIS_PROMPT = PromptTemplate(
+    template="""Analyze the following information gathered on the topic "{topic}":
+
+RESEARCH DATA:
+{research_data}
+
+Provide a comprehensive analysis addressing:
+1. Key insights and findings
+2. Patterns or trends identified
+3. Important relationships between data points
+4. Gaps or limitations in the available information
+5. Potential implications of these findings
+
+Your analysis should be structured, evidence-based, and focused on extracting meaningful conclusions
+from the research data.
+""",
+    required_variables=["topic", "research_data"]
+)
+
+MARKET_RESEARCH_PROMPT = PromptTemplate(
+    template="""Based on the information gathered about {category}, identify potential suppliers and relevant items.
+
+CONTEXT:
+{context}
+
+RESEARCH RESULTS:
+{research_results}
+
+For each potential supplier, extract:
+1. Supplier name
+2. Products or services offered related to {category}
+3. Any notable characteristics (e.g., location, specialization, reputation)
+4. Contact information if available
+
+For relevant items, identify:
+1. Item name
+2. Key features or specifications
+3. Typical price range (if available)
+4. Relevance to {category}
+
+Present your findings in a structured, comprehensive format.
+""",
+    required_variables=["category", "context", "research_results"]
+)
+```
+
+### Chain-of-Thought Prompts
+
+Templates designed to encourage structured reasoning:
+
+```python
+COT_REASONING_PROMPT = PromptTemplate(
+    template="""I need you to carefully reason through this {task_type} problem step by step.
+
+PROBLEM:
+{problem_statement}
+
+AVAILABLE INFORMATION:
+{available_information}
+
+Let's work through this methodically:
+
+1. First, let's understand what we're being asked to determine
+2. Next, let's identify the key pieces of information we need
+3. Then, let's analyze how to use this information
+4. Finally, let's reach a well-reasoned conclusion
+
+Think step by step and explain your reasoning clearly for each stage.
+""",
+    required_variables=["task_type", "problem_statement", "available_information"]
+)
+```
+
+### Context Management
+
+Functions for handling the inclusion of relevant context in prompts:
+
+```python
+def truncate_context(text: str, max_tokens: int = 4000) -> str:
+    """Truncate context to fit within token limits.
+    
+    This function estimates token count based on word count and
+    truncates the text to stay under the specified limit.
+    
+    Args:
+        text: The text to truncate
+        max_tokens: Maximum token count
+        
+    Returns:
+        str: The truncated text
+    """
+    # Estimate tokens (rough approximation: 1 token ≈ 0.75 words)
+    words = text.split()
+    estimated_tokens = len(words) * 1.33
+    
+    if estimated_tokens <= max_tokens:
+        return text
+        
+    # Calculate how many words to keep
+    words_to_keep = int(max_tokens / 1.33)
+    
+    # Return truncated text with indicator
+    return " ".join(words[:words_to_keep]) + "... [content truncated due to length]"
+
+def format_research_context(results: List[Dict[str, Any]], max_tokens: int = 8000) -> str:
+    """Format research results into a context string for prompts.
+    
+    This function takes a list of research results and formats them
+    into a structured context string for inclusion in prompts.
+    
+    Args:
+        results: List of research result dictionaries
+        max_tokens: Maximum token count
+        
+    Returns:
+        str: Formatted context string
+    """
+    context_parts = []
+    
+    for i, result in enumerate(results, 1):
+        source = result.get("source", f"Source {i}")
+        content = result.get("content", "")
+        timestamp = result.get("timestamp", "")
+        
+        # Format this result
+        result_text = f"SOURCE {i}: {source}\n"
+        if timestamp:
+            result_text += f"TIME: {timestamp}\n"
+        result_text += f"CONTENT:\n{content}\n\n"
+        
+        context_parts.append(result_text)
+        
+    # Join all parts and truncate if needed
+    full_context = "RESEARCH CONTEXT:\n\n" + "\n".join(context_parts)
+    return truncate_context(full_context, max_tokens)
+```
+
+## Prompt Categories
+
+The Prompt Management module provides various categories of prompts for different purposes:
+
+### System Prompts
+
+These define the overall behavior and role of the agent:
+
+| Prompt Template | Description |
+|-----------------|-------------|
+| `SYSTEM_PROMPT` | Base system message defining agent role and behavior |
+| `RESEARCH_SYSTEM_PROMPT` | System message for research-focused tasks |
+| `ANALYSIS_SYSTEM_PROMPT` | System message for analysis-focused tasks |
+| `MARKET_SYSTEM_PROMPT` | System message for market research tasks |
+
+### Task Prompts
+
+These guide the agent in performing specific tasks:
+
+| Prompt Template | Description |
+|-----------------|-------------|
+| `TOPIC_ANALYSIS_PROMPT` | Analyzing information on a specific topic |
+| `MARKET_RESEARCH_PROMPT` | Identifying suppliers and items for a category |
+| `RESEARCH_PLANNING_PROMPT` | Planning a research approach for a new topic |
+| `VALIDATION_PROMPT` | Validating the quality and completeness of research |
+
+### Reasoning Prompts
+
+These encourage structured reasoning and detailed thinking:
+
+| Prompt Template | Description |
+|-----------------|-------------|
+| `COT_REASONING_PROMPT` | Chain-of-thought reasoning for complex problems |
+| `STEP_BY_STEP_PROMPT` | Guided step-by-step approach to problem-solving |
+| `SELF_CRITIQUE_PROMPT` | Critical evaluation of initial conclusions |
+| `ALTERNATIVE_PERSPECTIVES_PROMPT` | Exploring multiple viewpoints on a topic |
+
+### Instruction-Following Prompts
+
+These focus on providing clear instructions for specific operations:
+
+| Prompt Template | Description |
+|-----------------|-------------|
+| `TOOL_USAGE_PROMPT` | Instructions for using specific tools |
+| `DATA_EXTRACTION_PROMPT` | Guidance for extracting structured data |
+| `FORMAT_FOLLOWING_PROMPT` | Instructions for following specific output formats |
+| `SCHEMA_ADHERENCE_PROMPT` | Guidance for adhering to data schemas |
+
+## Usage Examples
+
+### Basic Prompt Rendering
+
+```python
+from agent.prompts import SYSTEM_PROMPT
+
+def get_system_message(domain, task):
+    """Get a system message for the specified domain and task."""
+    # Render the system prompt
+    system_message = SYSTEM_PROMPT.render(
+        domain=domain,
+        task=task,
+        additional_instructions="Pay special attention to recent developments."
+    )
+    
+    return system_message
+```
+
+### Context-Aware Prompting
+
+```python
+from agent.prompts import TOPIC_ANALYSIS_PROMPT, format_research_context
+
+async def analyze_research_results(llm, tool_results, topic, category):
+    """Analyze research results using the LLM."""
+    # Format the research context
+    research_context = format_research_context(tool_results)
+    
+    # Render the analysis prompt
+    analysis_prompt = TOPIC_ANALYSIS_PROMPT.render(
+        topic=topic["name"],
+        research_data=research_context
+    )
+    
+    # Get analysis from LLM
+    analysis_result = await llm.ainvoke(analysis_prompt)
+    
+    return {
+        "analysis": analysis_result,
+        "topic": topic["name"],
+        "category": category
+    }
+```
+
+### Customizing Prompts for Specific Needs
+
+```python
+from agent.prompts import PromptTemplate
+
+# Create a custom prompt template
+SPECIALIZED_PROMPT = PromptTemplate(
+    template="""You are examining information about {product_category} with a focus on {focus_area}.
+
+CONTEXT:
+{context}
+
+Please analyze this information and identify:
+- Key trends in {focus_area}
+- Top products in {product_category}
+- Market gaps or opportunities
+- Challenges or limitations
+
+{additional_instructions}
+""",
+    required_variables=["product_category", "focus_area", "context"],
+    optional_variables={"additional_instructions": ""}
+)
+
+# Use the custom template
+def create_specialized_analysis(product_category, focus_area, research_data):
+    """Generate a specialized analysis using a custom prompt."""
+    # Render the specialized prompt
+    prompt = SPECIALIZED_PROMPT.render(
+        product_category=product_category,
+        focus_area=focus_area,
+        context=research_data,
+        additional_instructions="Focus particularly on sustainability aspects."
+    )
+    
+    # Use the prompt with the LLM
+    # ...
+```
+
+### Managing Prompt Versions
+
+```python
+from agent.prompts import PROMPTS
+
+def get_prompt_by_version(prompt_name, version="latest"):
+    """Get a prompt template by name and version."""
+    if prompt_name not in PROMPTS:
+        raise ValueError(f"Unknown prompt: {prompt_name}")
+        
+    prompt_versions = PROMPTS[prompt_name]
+    
+    if version == "latest":
+        # Get the latest version
+        version = max(prompt_versions.keys())
+        
+    if version not in prompt_versions:
+        raise ValueError(f"Unknown version {version} for prompt {prompt_name}")
+        
+    return prompt_versions[version]
+```
+
+## Best Practices
+
+1. **Clear Instructions**: Provide explicit, unambiguous instructions in prompts
+2. **Consistent Structure**: Maintain a consistent structure across similar prompts
+3. **Context Management**: Be mindful of token limits when including context
+4. **Prompt Versioning**: Track changes to prompts over time
+5. **Targeted Prompts**: Create specialized prompts for specific tasks
+6. **Validation**: Validate all required variables before rendering
+7. **Documentation**: Include clear documentation in prompt templates
+8. **Reusability**: Design prompts with reusability in mind
+9. **Error Handling**: Implement robust error handling for prompt rendering
+10. **Testing**: Test prompts with various inputs to ensure reliability
+
+## Related Components
+
+- **Graph Engine**: Uses prompts for node functions
+- **Agent Tools**: Integrated with tool-specific prompts
+- **State Management**: Provides context data for prompts
+- **Configuration Module**: May provide customization settings for prompts
+- **Utility Functions**: Used for prompt preprocessing and postprocessing 

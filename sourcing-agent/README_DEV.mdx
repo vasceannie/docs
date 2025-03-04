@@ -1,0 +1,357 @@
+---
+title: 'Developer Guide'
+description: 'Developer documentation and setup instructions'
+icon: 'book'
+---
+
+# Development Environment Setup
+
+This project uses a modern Python development environment with `uv` for fast, reliable package management and virtual environments, along with Node.js tools for additional functionality.
+
+## Prerequisites
+
+- Linux/Unix-based system
+- `curl`
+- `make`
+- `sudo` access (for npm installation)
+- Internet connection
+
+## Quick Start
+
+```bash
+# Complete setup
+make setup
+source ~/.bashrc
+source .venv/bin/activate
+
+# Run tests
+make test
+
+# Format and lint code
+make format
+make lint
+```bash
+
+## Detailed Setup Process
+
+### 1. Environment Setup
+
+The project uses a Makefile to automate the development environment setup. The main components are:
+
+- **uv**: A fast package installer and resolver for Python
+- **Python 3.12**: Latest stable Python version
+- **Virtual Environment**: Isolated Python environment for project dependencies
+- **langgraph-cli**: LangGraph CLI tool with in-memory support
+- **npm**: Node.js package manager (v20.x)
+- **repomix**: Repository analysis and management tool
+- **Development Tools**: Ruff for linting/formatting, mypy for type checking, pytest for testing
+
+### 2. Available Make Commands
+
+#### Environment Management
+
+```bash
+make setup         # Complete setup (uv + venv + dependencies + npm + repomix)
+make install-uv    # Install only uv package manager
+make create-venv   # Create only Python virtual environment
+make install-deps  # Install project dependencies
+make install-npm   # Install npm (Node.js v20.x)
+make install-repomix # Install repomix globally
+make clean         # Remove virtual environment and clean npm cache
+```bash
+
+#### Development Commands
+
+```bash
+# Testing
+make test                      # Run unit tests
+make test TEST_FILE=<file>     # Run specific test file
+make test_watch               # Run tests in watch mode
+make integration_tests        # Run integration tests
+make extended_tests          # Run extended test suite
+make test_profile           # Run tests with profiling
+
+# Code Quality
+make format                  # Format code
+make lint                    # Run all linters
+make lint_package           # Lint source code only
+make lint_tests            # Lint test code only
+make spell_check          # Check spelling
+make spell_fix           # Fix spelling errors
+make sonar              # Run SonarQube analysis
+```bash
+
+### 3. Step-by-Step Setup
+
+1. **Install uv and Create Virtual Environment**:
+
+   ```bash
+   make setup
+   ```bash
+
+   This will:
+   
+   - Install the uv package manager
+   - Add uv to your PATH
+   - Create a Python 3.12 virtual environment
+   - Install langgraph-cli and other dependencies
+
+2. **Update Your PATH**:
+
+   ```bash
+   source ~/.bashrc
+   ```bash
+
+3. **Activate the Virtual Environment**:
+
+   ```bash
+   source .venv/bin/activate
+   ```bash
+
+   Your prompt should change to indicate the virtual environment is active.
+
+4. **Installing Additional Dependencies**:
+   With the virtual environment activated, use uv to install packages:
+
+   ```bash
+   uv pip install <package-name>
+   ```bash
+
+### 4. Project Dependencies
+
+The setup automatically installs:
+
+- **langgraph-cli[inmem]**: LangGraph CLI tool with in-memory support
+- **Node.js Components**:
+  - Node.js v20.x: Latest LTS version
+  - npm: Node.js package manager
+  - repomix: Repository analysis tool
+- **Development Dependencies**:
+  - pytest: Testing framework
+  - ruff: Fast Python linter and formatter
+  - mypy: Static type checker
+  - codespell: Spell checker
+  - pytest-watch: Test watcher
+
+### 5. Development Workflow
+
+1. **Starting Development**:
+
+   ```bash
+   source .venv/bin/activate    # Activate virtual environment
+   ```bash
+
+2. **Before Committing Changes**:
+
+   ```bash
+   make format                  # Format code
+   make lint                    # Check for issues
+   make test                    # Run tests
+   ```bash
+
+3. **Running Specific Tests**:
+
+   ```bash
+   make test TEST_FILE=tests/unit_tests/test_specific.py
+   ```bash
+
+4. **Continuous Test Development**:
+
+   ```bash
+   make test_watch             # Watches for changes and runs tests
+   ```bash
+
+5. **Ending Development**:
+
+   ```bash
+   deactivate                  # Exit virtual environment
+   ```bash
+
+### 6. Running LangGraph Development Server
+
+To run the LangGraph development server with hot reloading:
+
+1. **Ensure Virtual Environment is Active**:
+
+   ```bash
+   source .venv/bin/activate
+   ```bash
+
+2. **Start the Development Server**:
+
+   ```bash
+   langgraph dev
+   ```bash
+
+   This will:
+   
+   - Start the server in development mode
+   - Enable hot reloading (automatic restart on code changes)
+   - Open your default browser automatically
+   - Use default port (typically 8000)
+
+3. **Common Options**:
+
+   ```bash
+   # Custom port
+   langgraph dev --port 3000
+
+   # Prevent browser from opening automatically
+   langgraph dev --no-browser
+
+   # Disable hot reloading
+   langgraph dev --no-reload
+
+   # Enable remote debugging
+   langgraph dev --debug-port 5678
+
+   # Custom host (be cautious with 0.0.0.0)
+   langgraph dev --host 127.0.0.1
+
+   # Specify maximum concurrent jobs per worker
+   langgraph dev --n-jobs-per-worker 5
+   ```bash
+
+4. **Using a Configuration File**:
+   If you have a custom configuration file:
+
+   ```bash
+   langgraph dev --config path/to/config.yaml
+   ```bash
+
+5. **Debugging**:
+   To enable remote debugging:
+
+   ```bash
+   # Install debugpy
+   uv pip install debugpy
+
+   # Run with debug port
+   langgraph dev --debug-port 5678 --wait-for-client
+   ```bash
+
+### 7. Maintenance
+
+- **Cleaning Up**: To remove the virtual environment and start fresh:
+
+  ```bash
+  make clean
+  ```bash
+
+- **Reinstalling**: To reinstall everything:
+
+  ```bash
+  make clean
+  make setup
+  ```bash
+
+## Why This Setup?
+
+- **uv**: Significantly faster than pip, with improved dependency resolution
+- **Python 3.12**: Latest stable version with performance improvements and new features
+- **Makefile**: Standardizes setup process and development commands across machines
+- **Virtual Environment**: Isolates project dependencies from system Python
+- **langgraph-cli**: Provides essential LangGraph functionality with in-memory support
+- **Node.js & npm**: Enables use of JavaScript/Node.js tools and utilities
+- **repomix**: Powerful tool for repository analysis and management
+- **Ruff**: Fast, comprehensive Python linter and formatter
+- **mypy**: Ensures type safety across the codebase
+- **pytest**: Robust testing framework with excellent plugin ecosystem
+
+## Code Quality with SonarQube
+
+This project is configured to use SonarQube for code quality analysis. SonarQube helps identify code smells, bugs, vulnerabilities, and technical debt.
+
+### Setup SonarQube
+
+1. **SonarQube Server**: You need access to a SonarQube server. You can:
+
+   - Use a hosted SonarQube instance
+   - Run SonarQube locally with Docker:
+
+     ```bash
+     docker run -d --name sonarqube -p 9000:9000 sonarqube:latest
+     ```bash
+
+   - Access the SonarQube UI at [http://localhost:9000](http://localhost:9000) (default credentials: admin/admin)
+
+2. **Configure Authentication**:
+
+   - Generate a token in SonarQube (User > My Account > Security > Generate Tokens)
+   - Set the token in your environment:
+
+     ```bash
+     export SONAR_LOGIN=your-token-here
+     export SONAR_HOST_URL=http://localhost:9000  # Adjust if using a different server
+     ```bash
+
+### Running Analysis
+
+Run the SonarQube analysis with:
+
+```bash
+make sonar
+```bash
+
+This will:
+
+1. Run tests with coverage (generates coverage.xml)
+2. Execute the SonarScanner with the project configuration
+3. Upload results to your SonarQube server
+
+> **Note**: The project has a test coverage requirement of 70%. The current coverage is around 24%, which means the `make sonar` command will show a coverage failure. This is expected and does not prevent the SonarQube analysis from running.
+
+### Manual Configuration
+
+If needed, you can customize the analysis by editing:
+
+- `sonar-project.properties` - Project configuration
+- `run-sonar-scan.sh` - Scanner execution script
+
+## Troubleshooting
+
+1. **uv not found**:
+
+   ```bash
+   source ~/.bashrc  # Reload shell configuration
+   ```bash
+
+2. **Python version issues**:
+
+   ```bash
+   make clean        # Remove existing environment
+   make create-venv  # Create fresh environment
+   ```bash
+
+3. **PATH issues**:
+
+   - Verify PATH includes `/root/.local/bin`
+   - Run `echo $PATH` to check
+
+4. **Dependency issues**:
+
+   ```bash
+   make clean        # Remove existing environment
+   make setup        # Fresh install of everything
+   ```bash
+
+5. **Linter/Formatter issues**:
+
+   ```bash
+   make install-deps # Reinstall development dependencies
+   ```bash
+
+6. **npm/Node.js issues**:
+
+   ```bash
+   # Check Node.js installation
+   node --version
+   npm --version
+   
+   # Reinstall Node.js and npm
+   make install-npm
+   
+   # Clear npm cache and reinstall repomix
+   make clean
+   make install-repomix
+   ```bash

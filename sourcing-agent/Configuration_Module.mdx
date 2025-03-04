@@ -1,0 +1,230 @@
+---
+title: 'Configuration Module'
+description: 'System configuration and settings management'
+icon: 'gear'
+---
+
+# Configuration Module
+
+## Overview
+
+The Configuration module (`src/agent/configuration.py`) serves as the central repository for all application settings, environment variables, and operational parameters. It provides a structured way to access and manage configuration across the entire agent system.
+
+## Primary Responsibilities
+
+1. **Environment Management**: Loading and validating environment variables
+2. **Default Settings**: Providing sensible defaults for optional settings
+3. **Validation**: Ensuring configuration integrity and completeness
+4. **Feature Flags**: Managing feature enablement and disablement
+5. **Secret Management**: Securely handling sensitive information
+
+## Core Components
+
+### Configuration Class
+
+The primary class for managing all system configuration. This singleton class provides centralized access to settings:
+
+```python
+class Configuration:
+    """Manages application configuration and environment settings.
+    
+    This class handles loading and validating all settings from environment 
+    variables with appropriate fallbacks. It provides a single source of truth
+    for application configuration.
+    """
+    
+    def __init__(self):
+        """Initialize configuration with values from environment."""
+        # Load settings from environment variables
+        self._load_environment_variables()
+        # Validate required settings
+        self._validate_configuration()
+```
+
+### Environment Variable Handling
+
+The module uses a standardized approach to load environment variables with appropriate type conversion and default values:
+
+```python
+def _load_environment_variables(self):
+    """Load all settings from environment variables with fallbacks.
+    
+    For each setting, this method:
+    1. Attempts to load from the environment
+    2. Applies type conversion (int, float, bool, etc.)
+    3. Falls back to default values when appropriate
+    4. Ensures required values are present
+    """
+    # API settings
+    self.api_base_url = os.getenv("API_BASE_URL", "http://localhost:8000")
+    self.api_timeout = int(os.getenv("API_TIMEOUT", "30"))
+    
+    # LLM settings
+    self.llm_provider = os.getenv("LLM_PROVIDER", "openai")
+    self.llm_model = os.getenv("LLM_MODEL", "gpt-4")
+    
+    # Feature flags
+    self.enable_caching = self._parse_bool(os.getenv("ENABLE_CACHING", "true"))
+    self.debug_mode = self._parse_bool(os.getenv("DEBUG_MODE", "false"))
+```
+
+### Configuration Validation
+
+The module validates that all required settings are present and properly formatted:
+
+```python
+def _validate_configuration(self):
+    """Ensure all required configuration values are present and valid.
+    
+    Raises:
+        ConfigurationError: If any required setting is missing or invalid
+    """
+    # Check for required API keys
+    if not self.openai_api_key and self.llm_provider == "openai":
+        raise ConfigurationError("OpenAI API key is required when using OpenAI as provider")
+        
+    # Validate numeric parameters are in acceptable ranges
+    if self.api_timeout < 1 or self.api_timeout > 300:
+        raise ConfigurationError("API_TIMEOUT must be between 1 and 300 seconds")
+```
+
+### Utility Methods
+
+Helper methods for configuration processing:
+
+```python
+def _parse_bool(self, value: str) -> bool:
+    """Parse string value to boolean.
+    
+    Args:
+        value: String value to parse ('true', 'yes', 'on', '1' are True)
+        
+    Returns:
+        bool: The parsed boolean value
+    """
+    return value.lower() in ("yes", "true", "t", "1", "on")
+    
+def get_api_headers(self) -> Dict[str, str]:
+    """Get prepared API headers with authorization.
+    
+    Returns:
+        Dict[str, str]: Headers dictionary ready for API requests
+    """
+    return {
+        "Authorization": f"Bearer {self.api_key}",
+        "Content-Type": "application/json",
+        "User-Agent": f"AgentApp/{self.version}"
+    }
+```
+
+## Configuration Properties
+
+The Configuration class provides numerous properties that are used throughout the agent system:
+
+### General Settings
+
+| Property | Description | Default | Type |
+|----------|-------------|---------|------|
+| `env` | Environment name (dev, test, prod) | "dev" | string |
+| `debug_mode` | Enable extended debugging | False | boolean |
+| `version` | Application version | "0.1.0" | string |
+
+### API Settings
+
+| Property | Description | Default | Type |
+|----------|-------------|---------|------|
+| `api_base_url` | Base URL for API calls | "http://localhost:8000" | string |
+| `api_timeout` | Timeout for API calls in seconds | 30 | integer |
+| `api_retries` | Number of automatic retries | 3 | integer |
+
+### LLM Settings
+
+| Property | Description | Default | Type |
+|----------|-------------|---------|------|
+| `llm_provider` | LLM provider (openai, anthropic, etc.) | "openai" | string |
+| `llm_model` | Model name to use | "gpt-4" | string |
+| `llm_temperature` | Temperature for LLM calls | 0.7 | float |
+| `llm_timeout` | Timeout for LLM calls in seconds | 60 | integer |
+
+### Storage Settings
+
+| Property | Description | Default | Type |
+|----------|-------------|---------|------|
+| `storage_type` | Storage backend (local, s3, etc.) | "local" | string |
+| `storage_path` | Path for local storage | "./storage" | string |
+| `enable_caching` | Enable result caching | True | boolean |
+| `cache_ttl` | Cache time-to-live in seconds | 3600 | integer |
+
+## Usage Examples
+
+### Basic Configuration Loading
+
+```python
+from agent.configuration import Configuration
+
+# Load configuration
+config = Configuration()
+
+# Use configuration values
+timeout = config.api_timeout
+base_url = config.api_base_url
+```
+
+### Conditional Logic Based on Configuration
+
+```python
+from agent.configuration import Configuration
+
+config = Configuration()
+
+# Use feature flags to control behavior
+if config.enable_caching:
+    result = cache.get(key) or fetch_from_api()
+    cache.set(key, result, ttl=config.cache_ttl)
+else:
+    result = fetch_from_api()
+    
+# Handle environment-specific logic
+if config.env == "dev":
+    # Use development-specific behavior
+    logger.setLevel(logging.DEBUG)
+else:
+    # Use production behavior
+    logger.setLevel(logging.WARNING)
+```
+
+### API Request Configuration
+
+```python
+import aiohttp
+from agent.configuration import Configuration
+
+config = Configuration()
+
+async def make_api_request(endpoint, data):
+    """Make API request with configured settings."""
+    url = f"{config.api_base_url}/{endpoint}"
+    headers = config.get_api_headers()
+    
+    async with aiohttp.ClientSession() as session:
+        timeout = aiohttp.ClientTimeout(total=config.api_timeout)
+        async with session.post(url, json=data, headers=headers, timeout=timeout) as response:
+            return await response.json()
+```
+
+## Best Practices
+
+1. **Single Source of Truth**: Always use the Configuration class for settings, never hardcode values
+2. **Environment Variables**: Use environment variables for deployment-specific settings
+3. **Validation**: Validate configuration values early to fail fast
+4. **Default Values**: Provide sensible defaults for optional settings
+5. **Documentation**: Keep the configuration documentation updated
+6. **Secrets**: Never log or expose sensitive configuration values
+7. **Reload Capability**: Allow for configuration reloading in long-running applications
+
+## Related Components
+
+- **State Management**: Uses configuration for state validation rules
+- **Graph Engine**: Configures workflow behavior based on settings
+- **Logging System**: Uses configuration for log levels and formats
+- **Tool Components**: Initialize with appropriate configuration settings 

@@ -1,0 +1,526 @@
+---
+title: 'Component Interfaces'
+description: 'API references and interface specifications'
+icon: 'code'
+---
+
+# Component Interfaces
+
+This document provides detailed information about the interfaces and APIs for each component in the Agent System. It serves as a reference for developers implementing new components or interacting with existing ones.
+
+## Table of Contents
+
+1. [Core Module Interfaces](#core-module-interfaces)
+   - [Graph Interface](#graph-interface)
+   - [State Interface](#state-interface)
+   - [Agent Interface](#agent-interface)
+2. [Node Interfaces](#node-interfaces)
+   - [Node Function Signatures](#node-function-signatures)
+   - [Node State Requirements](#node-state-requirements)
+3. [Tool Interfaces](#tool-interfaces)
+   - [Tool Registration](#tool-registration)
+   - [Tool Execution](#tool-execution)
+4. [Configuration Interface](#configuration-interface)
+   - [Configuration Properties](#configuration-properties)
+   - [Environment Variables](#environment-variables)
+5. [Utility Function Interfaces](#utility-function-interfaces)
+   - [HTTP Utilities](#http-utilities)
+   - [Retry Utilities](#retry-utilities)
+   - [Validation Utilities](#validation-utilities)
+
+## Core Module Interfaces
+
+### GraphBuilder Interface
+
+The GraphBuilder class is responsible for constructing the execution graph that powers the agent workflow.
+
+```python
+class GraphBuilder:
+    def __init__(self, state_type: Type[State] = None):
+        """Initialize a graph builder with an optional state type."""
+        
+    def add_node(self, node: Callable, name: str) -> 'GraphBuilder':
+        """
+        Add a node to the graph.
+        
+        Args:
+            node: A callable that processes a state and returns an updated state
+            name: A unique name for the node
+            
+        Returns:
+            Self for method chaining
+        """
+        
+    def add_edge(self, source: str, target: str, 
+                condition: Optional[Callable[[State], bool]] = None) -> 'GraphBuilder':
+        """
+        Add an edge between nodes.
+        
+        Args:
+            source: The source node name
+            target: The target node name
+            condition: Optional function that determines if this edge should be followed
+            
+        Returns:
+            Self for method chaining
+        """
+        
+    def build(self) -> 'Graph':
+        """
+        Build and return a Graph instance.
+        
+        Returns:
+            A configured Graph instance
+        """
+```
+
+### Graph Interface
+
+The Graph class represents the execution flow for the agent, managing the processing of nodes and state transitions.
+
+```python
+class Graph:
+    def __init__(self, nodes: Dict[str, Callable], 
+                edges: Dict[str, List[Edge]]):
+        """
+        Initialize a graph with nodes and edges.
+        
+        Args:
+            nodes: Dictionary mapping node names to node functions
+            edges: Dictionary mapping source nodes to a list of edges
+        """
+        
+    def run(self, state: State) -> State:
+        """
+        Execute the graph with the given initial state.
+        
+        Args:
+            state: The initial state
+            
+        Returns:
+            The final state after graph execution
+        """
+        
+    async def arun(self, state: State) -> State:
+        """
+        Execute the graph asynchronously with the given initial state.
+        
+        Args:
+            state: The initial state
+            
+        Returns:
+            The final state after graph execution
+        """
+```
+
+### State Interface
+
+The State class provides type-safe state management with validation and transformation features.
+
+```python
+class State(BaseModel):
+    """Base state class for all graph states."""
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    
+    @classmethod
+    def create(cls, **kwargs) -> 'State':
+        """
+        Create a new state instance with validation.
+        
+        Args:
+            **kwargs: State field values
+            
+        Returns:
+            A new validated state instance
+        """
+        
+    def update(self, **kwargs) -> 'State':
+        """
+        Create a new state with updated values.
+        
+        Args:
+            **kwargs: Fields to update
+            
+        Returns:
+            A new state instance with updated values
+        """
+        
+    def merge(self, other: 'State') -> 'State':
+        """
+        Merge another state into this one.
+        
+        Args:
+            other: Another state to merge
+            
+        Returns:
+            A new state with merged values
+        """
+```
+
+### Agent Interface
+
+The AgentInterface defines the standard interface for all agent implementations.
+
+```python
+class AgentInterface(ABC):
+    """Abstract interface for all agent implementations."""
+    
+    @abstractmethod
+    def initialize(self, config: Dict[str, Any] = None) -> None:
+        """
+        Initialize the agent with configuration.
+        
+        Args:
+            config: Optional configuration dictionary
+        """
+        pass
+        
+    @abstractmethod
+    def process(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Process inputs and return results.
+        
+        Args:
+            inputs: Input data for processing
+            
+        Returns:
+            Processing results
+        """
+        pass
+        
+    @abstractmethod
+    async def aprocess(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Process inputs asynchronously and return results.
+        
+        Args:
+            inputs: Input data for processing
+            
+        Returns:
+            Processing results
+        """
+        pass
+```
+
+## Node Interfaces
+
+### Node Function Signatures
+
+All node functions follow a standard signature pattern:
+
+```python
+async def node_function(
+    state: Dict[str, Any], config: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """Process the state at this node.
+
+    Args:
+        state: The current state dictionary.
+        config: Optional configuration for processing.
+
+    Returns:
+        Updated state dictionary.
+    """
+```
+
+### Node State Requirements
+
+Each node type has specific state requirements:
+
+#### Main Node
+
+```python
+# Required input fields
+topic: str  # The main topic for processing
+category: str  # The category of the task
+
+# Output fields
+workflow: Dict[str, Any]  # Workflow parameters
+next_node: str  # The next node to execute
+```
+
+#### Research Node
+
+```python
+# Required input fields
+topic: str  # The topic to research
+category: str  # The category of research
+
+# Output fields
+research_results: List[Dict[str, Any]]  # Research findings
+analysis: Dict[str, Any]  # Analysis of research findings
+```
+
+#### Market Node
+
+```python
+# Required input fields
+research_results: List[Dict[str, Any]]  # Research findings from the research node
+category: str  # The market category
+
+# Output fields
+market_analysis: Dict[str, Any]  # Market analysis results
+suppliers: List[Dict[str, Any]]  # Identified suppliers
+```
+
+#### Analysis Node
+
+```python
+# Required input fields
+research_results: List[Dict[str, Any]]  # Research findings
+market_analysis: Dict[str, Any]  # Market analysis results
+
+# Output fields
+analysis_report: Dict[str, Any]  # Final analysis report
+recommendations: List[Dict[str, Any]]  # Recommendations based on analysis
+```
+
+#### Error Node
+
+```python
+# Required input fields
+error: Dict[str, Any]  # Error information
+error_type: str  # Type of error that occurred
+
+# Output fields
+recovery_path: Optional[str]  # Path for recovery, if possible
+is_recoverable: bool  # Whether the error is recoverable
+```
+
+#### Validation Node
+
+```python
+# Required input fields
+[varies based on what is being validated]
+
+# Output fields
+is_valid: bool  # Whether the validation passed
+validation_errors: List[Dict[str, Any]]  # Validation errors, if any
+```
+
+## Tool Interfaces
+
+### Tool Registration
+
+Tools are registered using a decorator:
+
+```python
+@create_tool(
+    name="web_search",
+    description="Search the web for information",
+    parameters=[
+        {
+            "name": "query",
+            "type": "string",
+            "description": "The search query",
+            "required": True,
+        },
+        {
+            "name": "num_results",
+            "type": "integer",
+            "description": "Number of results to return",
+            "required": False,
+            "default": 5,
+        },
+    ],
+)
+async def web_search_tool(
+    query: str, num_results: int = 5, config: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """Search the web for information.
+
+    Args:
+        query: The search query.
+        num_results: Number of results to return.
+        config: Optional configuration.
+
+    Returns:
+        Search results.
+    """
+```
+
+### Tool Execution
+
+Tools are executed through a standardized interface:
+
+```python
+async def execute_tool(
+    tool_name: str,
+    parameters: Dict[str, Any],
+    config: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Execute a tool with the given parameters.
+
+    Args:
+        tool_name: The name of the tool to execute.
+        parameters: Parameters for the tool.
+        config: Optional configuration.
+
+    Returns:
+        Tool execution results.
+
+    Raises:
+        ToolNotFoundError: If the tool is not registered.
+        ToolExecutionError: If tool execution fails.
+    """
+```
+
+## Configuration Interface
+
+### Configuration Properties
+
+The Configuration class provides access to system settings:
+
+```python
+class Configuration:
+    """Configuration manager for the agent system."""
+
+    def __init__(
+        self,
+        config_path: Optional[str] = None,
+        env_prefix: str = "AGENT_",
+        load_dotenv: bool = True,
+    ):
+        """Initialize the configuration.
+
+        Args:
+            config_path: Optional path to a configuration file.
+            env_prefix: Prefix for environment variables.
+            load_dotenv: Whether to load .env file.
+        """
+        
+    def get(self, key: str, default: Any = None) -> Any:
+        """Get a configuration value.
+
+        Args:
+            key: The configuration key.
+            default: Default value if key is not found.
+
+        Returns:
+            The configuration value.
+        """
+        
+    def set(self, key: str, value: Any) -> None:
+        """Set a configuration value.
+
+        Args:
+            key: The configuration key.
+            value: The value to set.
+        """
+        
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert configuration to a dictionary.
+
+        Returns:
+            Dictionary representation of the configuration.
+        """
+```
+
+### Environment Variables
+
+Common environment variables used by the system:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| AGENT_LOG_LEVEL | Logging level | INFO |
+| AGENT_LOG_FILE | Path to log file | None |
+| AGENT_BRAVE_API_KEY | API key for Brave search | None |
+| AGENT_OPENAI_API_KEY | API key for OpenAI | None |
+| AGENT_MAX_RETRIES | Maximum number of retries | 3 |
+| AGENT_RETRY_DELAY | Initial retry delay in seconds | 1.0 |
+| AGENT_TIMEOUT | Request timeout in seconds | 30.0 |
+
+## Utility Function Interfaces
+
+### HTTP Utilities
+
+```python
+async def make_http_request(
+    url: str,
+    method: str = "GET",
+    headers: Optional[Dict[str, str]] = None,
+    params: Optional[Dict[str, Any]] = None,
+    data: Optional[Dict[str, Any]] = None,
+    json_data: Optional[Dict[str, Any]] = None,
+    timeout: Optional[float] = None,
+    max_retries: Optional[int] = None,
+    retry_delay: Optional[float] = None,
+    config: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Make an HTTP request with retry logic.
+
+    Args:
+        url: The URL to request.
+        method: HTTP method (GET, POST, etc.).
+        headers: Optional request headers.
+        params: Optional URL parameters.
+        data: Optional form data.
+        json_data: Optional JSON data.
+        timeout: Request timeout in seconds.
+        max_retries: Maximum number of retries.
+        retry_delay: Initial retry delay in seconds.
+        config: Optional configuration.
+
+    Returns:
+        Response data.
+
+    Raises:
+        HTTPError: If the request fails after all retries.
+    """
+```
+
+### Retry Utilities
+
+```python
+def async_retry(
+    max_retries: Optional[int] = None,
+    retry_delay: Optional[float] = None,
+    backoff_factor: Optional[float] = None,
+    retry_exceptions: Optional[Tuple[Type[Exception], ...]] = None,
+    config_key: Optional[str] = None,
+):
+    """Decorator for retrying asynchronous functions.
+
+    Args:
+        max_retries: Maximum number of retries.
+        retry_delay: Initial retry delay in seconds.
+        backoff_factor: Factor to increase delay between retries.
+        retry_exceptions: Exceptions to retry on.
+        config_key: Key in config to get retry settings.
+
+    Returns:
+        Decorated function.
+    """
+```
+
+### Validation Utilities
+
+```python
+def validate_required_fields(data: Dict[str, Any], required_fields: List[str]) -> List[str]:
+    """Validate that required fields are present in the data.
+
+    Args:
+        data: The data to validate.
+        required_fields: List of required field names.
+
+    Returns:
+        List of missing field names.
+    """
+    
+def validate_field_types(
+    data: Dict[str, Any], type_specs: Dict[str, Type]
+) -> List[Tuple[str, Type, Any]]:
+    """Validate that fields have the correct types.
+
+    Args:
+        data: The data to validate.
+        type_specs: Dictionary mapping field names to expected types.
+
+    Returns:
+        List of tuples (field_name, expected_type, actual_value) for invalid fields.
+    """
+```
+
+This document provides a comprehensive reference for the key interfaces and APIs in the Agent System. Use this as a guide when implementing new components or interacting with existing ones. 

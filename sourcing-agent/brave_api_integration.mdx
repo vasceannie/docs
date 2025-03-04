@@ -1,0 +1,146 @@
+---
+title: 'Brave API Integration'
+description: 'Integration with Brave Search API'
+icon: 'magnifying-glass'
+---
+
+# Brave Search API Integration
+
+The Sourcing Agent now integrates with Brave Search API's advanced endpoints to provide enhanced research capabilities:
+
+1. **Brave Summarizer API** - Generate AI-powered summaries of complex topics
+2. **Brave News API** - Find recent news articles and industry developments
+
+## Environment Setup
+
+To use these features, set the following environment variables:
+
+```bash
+# Required for all Brave API features
+BRAVE_SEARCH_API_KEY=your-brave-api-key
+
+# Endpoints for standard web search and content
+BRAVE_SEARCH_ENDPOINT=https://api.search.brave.com/res/v1/web/search
+BRAVE_WEB_ENDPOINT=https://api.search.brave.com/res/v1/web/content
+
+# New endpoints for summarizer and news
+BRAVE_SUMMARIZER_ENDPOINT=https://api.search.brave.com/res/v1/summarizer/search
+BRAVE_NEWS_ENDPOINT=https://api.search.brave.com/res/v1/news/search
+```
+
+## Tool Capabilities
+
+### Summarizer Tool
+
+The `summarize_research` tool provides AI-generated summaries of search results with key topics identified:
+
+- Input: Search query string
+- Output: Summary text, key topics, and source information (5 sources per query)
+- Usage: Best for complex technical topics that need concise explanation
+
+Example:
+
+```json
+{
+  "summary": "The latest developments in electric vehicle technology highlight advancements in battery storage, improved charging infrastructure, and longer range capabilities as detailed sources confirm continuous innovation.",
+  "key_topics": ["Electric Vehicles", "Battery Technology", "Charging Infrastructure"],
+  "search_results": [
+    {
+      "title": "Revolutionary Battery Designs Propel Electric Vehicles",
+      "url": "https://technews.example.com/electric-vehicles",
+      "description": "An in-depth review of the latest battery innovations transforming the electric vehicle industry.",
+      "source": "Tech News Daily"
+    },
+    {
+      "title": "Charging Stations Set to Multiply Across Cities",
+      "url": "https://energyevolution.example.com/charging-infrastructure",
+      "description": "New public and private investments are driving the expansion of charging networks in urban areas.",
+      "source": "Energy Evolution"
+    },
+    {
+      "title": "Electric Cars Gain Longer Range with Next-Gen Engines",
+      "url": "https://autoinnovation.example.com/new-electric-range",
+      "description": "Exploring the impact of improved engine designs on extending the drive range of modern electric vehicles.",
+      "source": "Auto Innovation"
+    },
+    {
+      "title": "Tech Giants Invest in Sustainable Mobility Solutions",
+      "url": "https://sustainability.example.com/mobility-solutions",
+      "description": "A roundup of major tech companies investing in sustainable and innovative mobility projects.",
+      "source": "Sustainability Insights"
+    },
+    {
+      "title": "Market Analysis: Electric Vehicle Trends of 2023",
+      "url": "https://marketwatch.example.com/ev-trends",
+      "description": "Data-driven analysis on the growth and future trends in the electric vehicle marketplace.",
+      "source": "Market Watch"
+    }
+  ]
+}
+
+### News Search Tool
+
+The `search_news` tool provides recent news articles related to the query:
+
+- Input: Search query string, freshness parameter ("h", "d", "w", "m")
+- Output: List of news articles with titles, URLs, descriptions, and sources (5 articles per query)
+- Usage: Best for finding recent developments, market trends, and industry news
+
+Example:
+
+```json
+[
+  {
+    "title": "News Article Title",
+    "url": "https://news-source.com/article",
+    "description": "Article description",
+    "published_date": "2023-07-15T12:00:00Z",
+    "source": "News Source"
+  }
+  // ... 4 more articles
+]
+```
+
+## Integration with Research Workflow
+
+The tools are integrated into the agent's research workflow and can be used to:
+
+1. Find general information with `search_web` (3 results per query)
+2. Get recent developments with `search_news` (5 results per query)
+3. Summarize complex topics with `summarize_research` (5 sources per query)
+4. Extract detailed content with `scrape_website`
+
+## Rate Limiting
+
+The tools use the following rate limiting configuration:
+
+- Web search: 3 results per query
+- Summarizer: 5 results per query
+- News search: 5 results per query
+- 5 requests per second for web APIs (including summarizer and news)
+- Timeout set to 30 seconds per request
+
+## Citation Handling
+
+All results from the tools are automatically added as citations:
+
+- Web search results are added with title, URL, and description
+- Summarizer results include both the AI summary and all 5 source articles
+- News results include title, URL, description, source, and publication date
+
+## Error Handling
+
+The tools include comprehensive error handling:
+
+- Configuration validation
+- API error responses
+- Timeout handling
+- Proper logging of all errors
+
+If the API key or endpoints are not configured, the tools will return appropriate error messages.
+
+## Further Reading
+
+- [Brave Search API Documentation](https://brave.com/search/api/)
+- [Brave Summarizer API Reference](https://brave.com/search/api/summarizer)
+- [Brave News API Reference](https://brave.com/search/api/news) 

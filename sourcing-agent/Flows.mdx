@@ -1,0 +1,155 @@
+---
+title: 'Process Flows'
+description: 'Detailed process and workflow documentation'
+icon: 'arrows-split-up-and-left'
+---
+
+# Flow Diagrams
+
+sequenceDiagram
+    participant Tester as test_retry
+    participant RetryDecorator as async_retry
+    participant Func as failing_function
+
+    Tester->>RetryDecorator: call failing_function()
+    RetryDecorator->>Func: attempt 1 call
+    Func-->>RetryDecorator: Exception (Attempt 1 failed)
+    RetryDecorator->>Tester: log warning & sleep
+    Note over RetryDecorator: End of attempt 1
+
+    RetryDecorator->>Func: attempt 2 call
+    Func-->>RetryDecorator: Exception (Attempt 2 failed)
+    RetryDecorator->>Tester: log warning & sleep
+    Note over RetryDecorator: End of attempt 2
+
+    RetryDecorator->>Func: attempt 3 call
+    Func-->>RetryDecorator: Return "Success!"
+    RetryDecorator->>Tester: returns "Success!"
+
+    sequenceDiagram
+    participant AgentState
+    participant research_node
+    participant Configuration
+    participant LLM
+    participant Tools
+    participant execute_research_tools
+    participant analyze_research_results
+    participant update_topic_with_analysis
+
+    AgentState->>research_node: Execute research_node(state)
+    research_node->>Configuration: config = Configuration()
+    research_node->>LLM: llm = get_llm(config)
+    research_node->>Tools: tools = create_research_tools(config)
+    research_node->>LLM: llm_with_tools = llm.bind_tools(tools)
+    research_node->>execute_research_tools: tool_results = execute_research_tools(llm_with_tools, current_topic, state.category, config)
+    execute_research_tools-->>research_node: Return tool_results
+    research_node->>analyze_research_results: analysis_result = analyze_research_results(llm, tool_results, current_topic, state.category)
+    analyze_research_results-->>research_node: Return analysis_result
+    research_node->>update_topic_with_analysis: current_topic = update_topic_with_analysis(current_topic, analysis_result, tool_results)
+    update_topic_with_analysis-->>research_node: Return current_topic
+    research_node-->>AgentState: Return new_state
+    
+    sequenceDiagram
+    participant Agent
+    participant aiohttp.ClientSession
+    participant Brave Web API
+    participant BeautifulSoup
+
+    Agent->>aiohttp.ClientSession: session.get(config.brave_web_endpoint, headers, params)
+    activate aiohttp.ClientSession
+    aiohttp.ClientSession->>Brave Web API: GET request with URL and headers
+    activate Brave Web API
+    Brave Web API-->>aiohttp.ClientSession: Response (HTML content)
+    deactivate Brave Web API
+    aiohttp.ClientSession-->>Agent: Response data
+    deactivate aiohttp.ClientSession
+    Agent->>BeautifulSoup: soup = BeautifulSoup(data["html"], "html.parser")
+    activate BeautifulSoup
+    BeautifulSoup-->>Agent: Parsed HTML
+    deactivate BeautifulSoup
+    Agent->>Agent: Extract content from specified elements
+    Agent-->>Agent: Returns scraped content and metadata
+    
+
+    Project Structure (depth: 3):
+----
+src/
+├── agent
+│   ├── checkpoints
+│   │   ├── __init__.py
+│   │   ├── persistence.py
+│   │   ├── recovery.py
+│   │   └── versioning.py
+│   ├── cli
+│   │   ├── __init__.py
+│   │   └── run.py
+│   ├── config
+│   │   ├── configuration.py
+│   │   ├── __init__.py
+│   │   └── settings.py
+│   ├── core
+│   │   ├── agent.py
+│   │   ├── graph.py
+│   │   ├── __init__.py
+│   │   └── state.py
+│   ├── examples
+│   │   ├── __init__.py
+│   │   └── simple_graph.py
+│   ├── nodes
+│   │   ├── analysis.py
+│   │   ├── error.py
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── market.py
+│   │   ├── quality_evaluation.py
+│   │   ├── research.py
+│   │   └── validation.py
+│   ├── prompts
+│   │   ├── analysis.py
+│   │   ├── __init__.py
+│   │   ├── reflection.py
+│   │   ├── research.py
+│   │   ├── templates.py
+│   │   └── validation.py
+│   ├── reflection
+│   │   ├── critique.py
+│   │   ├── evaluator.py
+│   │   ├── feedback.py
+│   │   └── __init__.py
+│   ├── services
+│   │   ├── __init__.py
+│   │   ├── postgres.py
+│   │   └── qdrant.py
+│   ├── subgraphs
+│   │   ├── analysis_flow.py
+│   │   ├── __init__.py
+│   │   ├── research_flow.py
+│   │   └── validation_flow.py
+│   ├── supervisors
+│   │   ├── __init__.py
+│   │   ├── orchestrator.py
+│   │   ├── task_manager.py
+│   │   └── team_supervisor.py
+│   ├── tools
+│   │   ├── base.py
+│   │   ├── evaluator.py
+│   │   ├── __init__.py
+│   │   ├── mock_tools.py
+│   │   ├── retry_stats.py
+│   │   ├── scraper.py
+│   │   ├── search.py
+│   │   └── storage.py
+│   ├── utils
+│   │   ├── async_utils.py
+│   │   ├── cache.py
+│   │   ├── company_extraction.py
+│   │   ├── error_handling.py
+│   │   ├── extraction.py
+│   │   ├── http.py
+│   │   ├── __init__.py
+│   │   ├── logging.py
+│   │   └── retry_stats.py
+│   ├── constants.py
+│   ├── exceptions.py
+│   ├── __init__.py
+│   ├── log_config.py

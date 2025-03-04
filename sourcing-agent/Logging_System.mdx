@@ -1,0 +1,444 @@
+---
+title: 'Logging System'
+description: 'Structured logging and monitoring configuration'
+icon: 'list'
+---
+
+# Logging System Module
+
+## Overview
+
+The Logging System module (`src/agent/log_config.py`) provides structured logging capabilities throughout the agent system. It standardizes the format, handling, and configuration of logs to facilitate debugging, monitoring, and performance analysis.
+
+## Primary Responsibilities
+
+1. **Logger Configuration**: Setting up consistent logging across all modules
+2. **Log Formatting**: Defining structured log formats for machine and human readability
+3. **Log Level Management**: Controlling the verbosity of system logging
+4. **Log Routing**: Directing logs to appropriate destinations (console, files, etc.)
+5. **Contextual Logging**: Adding contextual information to logs
+
+## Core Components
+
+### Logger Configuration
+
+The primary function for setting up the logging system:
+
+```python
+def configure_logging(
+    log_level: Optional[str] = None,
+    enable_file_logging: bool = True,
+    log_file_path: Optional[str] = None,
+    log_format: Optional[str] = None
+) -> logging.Logger:
+    """Configure the logging system for the agent.
+    
+    This function sets up a standardized logging configuration with
+    appropriate handlers, formatters, and log levels.
+    
+    Args:
+        log_level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        enable_file_logging: Whether to log to a file
+        log_file_path: Path to the log file (default: logs/agent.log)
+        log_format: Format string for log messages
+        
+    Returns:
+        logging.Logger: The configured root logger
+    """
+    # Get configuration
+    config = Configuration()
+    
+    # Set default log level from configuration if not specified
+    if log_level is None:
+        log_level = config.log_level
+        
+    # Convert string log level to numeric value
+    numeric_level = getattr(logging, log_level.upper(), logging.INFO)
+    
+    # Set default log file path if not specified
+    if log_file_path is None and enable_file_logging:
+        log_file_path = config.log_file_path or "logs/agent.log"
+        
+    # Set default log format if not specified
+    if log_format is None:
+        log_format = (
+            "%(asctime)s | %(levelname)-8s | %(name)s:%(lineno)d | "
+            "%(trace_id)s | %(message)s"
+        )
+    
+    # Create logs directory if it doesn't exist and file logging is enabled
+    if enable_file_logging and log_file_path:
+        os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+    
+    # Configure root logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(numeric_level)
+    
+    # Remove existing handlers
+    for handler in root_logger.handlers[:]:
+        root_logger.removeHandler(handler)
+    
+    # Add filter to inject trace ID
+    class TraceIDFilter(logging.Filter):
+        def filter(self, record):
+            if not hasattr(record, 'trace_id'):
+                record.trace_id = get_current_trace_id() or '-'
+            return True
+    
+    # Create formatter
+    formatter = logging.Formatter(log_format)
+    
+    # Create console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    console_handler.addFilter(TraceIDFilter())
+    root_logger.addHandler(console_handler)
+    
+    # Create file handler if enabled
+    if enable_file_logging and log_file_path:
+        try:
+            file_handler = TimedRotatingFileHandler(
+                filename=log_file_path,
+                when='midnight',
+                backupCount=14  # Keep logs for 14 days
+            )
+            file_handler.setFormatter(formatter)
+            file_handler.addFilter(TraceIDFilter())
+            root_logger.addHandler(file_handler)
+        except Exception as e:
+            # Log to console if file handler creation fails
+            console_handler.setLevel(logging.WARNING)
+            root_logger.warning(f"Failed to create file handler: {str(e)}")
+    
+    # Return the logger
+    return root_logger
+```
+
+### Trace Context Management
+
+Functions for tracking request context across asynchronous operations:
+
+```python
+# Thread-local storage for trace ID
+_trace_context = ContextVar('trace_id', default=None)
+
+def get_current_trace_id() -> Optional[str]:
+    """Get the current trace ID from context.
+    
+    Returns:
+        Optional[str]: The current trace ID or None if not set
+    """
+    return _trace_context.get()
+
+def set_trace_id(trace_id: Optional[str] = None) -> Token:
+    """Set a trace ID for the current context.
+    
+    If no trace ID is provided, a new one will be generated.
+    
+    Args:
+        trace_id: Optional trace ID to set
+        
+    Returns:
+        Token: Context variable token for resetting
+    """
+    if trace_id is None:
+        trace_id = f"trace-{uuid.uuid4().hex[:8]}"
+    return _trace_context.set(trace_id)
+
+def clear_trace_id(token: Token) -> None:
+    """Clear the trace ID using the provided token.
+    
+    Args:
+        token: Token returned from set_trace_id
+    """
+    _trace_context.reset(token)
+```
+
+### Request Context Logger
+
+A specialized logger that includes request context:
+
+```python
+class RequestContextAdapter(logging.LoggerAdapter):
+    """Logger adapter that adds request context to log records.
+    
+    This adapter injects request-specific information like request ID,
+    user ID, and other contextual data into log messages.
+    """
+    
+    def __init__(self, logger, extra=None):
+        """Initialize the adapter with a logger and extra context.
+        
+        Args:
+            logger: The logger to wrap
+            extra: Optional extra context data
+        """
+        super().__init__(logger, extra or {})
+    
+    def process(self, msg, kwargs):
+        """Process the log message to include context data.
+        
+        Args:
+            msg: The log message
+            kwargs: Keyword arguments for the log call
+            
+        Returns:
+            Tuple[str, dict]: Processed message and kwargs
+        """
+        # Get request context
+        context = get_current_request_context() or {}
+        
+        # Create extra data with context
+        kwargs_extra = kwargs.get('extra', {}).copy()
+        
+        # Include request ID in extra data
+        if 'request_id' not in kwargs_extra and 'request_id' in context:
+            kwargs_extra['request_id'] = context['request_id']
+            
+        # Include user ID in extra data
+        if 'user_id' not in kwargs_extra and 'user_id' in context:
+            kwargs_extra['user_id'] = context['user_id']
+        
+        # Update kwargs with the enhanced extra data
+        if kwargs_extra:
+            kwargs['extra'] = kwargs_extra
+            
+        return msg, kwargs
+```
+
+### Log Levels
+
+The logging system supports these standard log levels:
+
+| Level | Value | Description |
+|-------|-------|-------------|
+| `DEBUG` | 10 | Detailed information for debugging |
+| `INFO` | 20 | Confirmation that things are working as expected |
+| `WARNING` | 30 | Indication that something unexpected happened |
+| `ERROR` | 40 | Due to a more serious problem, a function failed |
+| `CRITICAL` | 50 | A serious error indicating the program may be unable to continue |
+
+### Log Format
+
+The default log format includes:
+
+- **Timestamp**: When the log entry was created
+- **Log Level**: Severity level (DEBUG, INFO, etc.)
+- **Module/Line**: Where the log was generated
+- **Trace ID**: Unique identifier for tracking requests
+- **Message**: The actual log message
+
+Example:
+```
+2023-01-01 12:00:00,123 | INFO     | agent.graph:356 | trace-a1b2c3d4 | Starting research process for topic "renewable energy"
+```
+
+## Configuration Options
+
+The logging system can be configured through the Configuration module and environment variables:
+
+| Configuration | Environment Variable | Default | Description |
+|---------------|---------------------|---------|-------------|
+| Log Level | `LOG_LEVEL` | "INFO" | Controls log verbosity |
+| File Logging | `ENABLE_FILE_LOGGING` | True | Whether to write logs to a file |
+| Log File Path | `LOG_FILE_PATH` | "logs/agent.log" | Path to the log file |
+| Console Logging | `ENABLE_CONSOLE_LOGGING` | True | Whether to display logs in the console |
+
+## Usage Examples
+
+### Basic Logging
+
+```python
+import logging
+from agent.log_config import configure_logging
+
+# Configure logging system
+logger = configure_logging()
+
+# Log at different levels
+logger.debug("Detailed debug information")
+logger.info("Process started successfully")
+logger.warning("Configuration parameter missing, using default")
+logger.error("Failed to connect to external service")
+logger.critical("System cannot continue due to critical failure")
+```
+
+### Module-Specific Logging
+
+```python
+import logging
+from agent.log_config import configure_logging
+
+# Configure root logger
+configure_logging()
+
+# Get a logger specific to this module
+logger = logging.getLogger(__name__)
+
+# Log with module context automatically included
+logger.info("Processing item 12345")
+```
+
+### Contextual Logging with Trace IDs
+
+```python
+import asyncio
+import logging
+from agent.log_config import configure_logging, set_trace_id, clear_trace_id
+
+# Configure logging
+configure_logging()
+logger = logging.getLogger(__name__)
+
+async def process_request(request_id, data):
+    """Process a request with trace context."""
+    # Set trace ID for this request
+    token = set_trace_id(f"req-{request_id}")
+    
+    try:
+        # All logs in this function will include the trace ID
+        logger.info(f"Starting processing for request {request_id}")
+        
+        # Perform processing
+        result = await some_async_function(data)
+        
+        logger.info(f"Completed processing for request {request_id}")
+        return result
+    except Exception as e:
+        logger.error(f"Error processing request {request_id}: {str(e)}")
+        raise
+    finally:
+        # Clear trace ID when done
+        clear_trace_id(token)
+```
+
+### Request Context Logging
+
+```python
+import logging
+from agent.log_config import RequestContextAdapter, configure_logging
+
+# Configure logging
+configure_logging()
+
+def log_with_request_context(request_data):
+    """Log with additional request context."""
+    # Create a base logger
+    base_logger = logging.getLogger(__name__)
+    
+    # Create context with request-specific data
+    context = {
+        'request_id': request_data.get('id', 'unknown'),
+        'user_id': request_data.get('user_id', 'anonymous')
+    }
+    
+    # Create an adapter with the context
+    logger = RequestContextAdapter(base_logger, context)
+    
+    # Log with context automatically included
+    logger.info("Processing user request")
+    
+    # The log output will include request_id and user_id
+```
+
+### Configuring Custom Log Levels
+
+```python
+import logging
+from agent.log_config import configure_logging
+
+# Define a custom log level
+AUDIT_LEVEL = 25  # Between INFO and WARNING
+logging.addLevelName(AUDIT_LEVEL, "AUDIT")
+
+# Add audit method to Logger class
+def audit(self, message, *args, **kwargs):
+    """Log at audit level."""
+    if self.isEnabledFor(AUDIT_LEVEL):
+        self._log(AUDIT_LEVEL, message, args, **kwargs)
+
+# Add the method to the Logger class
+logging.Logger.audit = audit
+
+# Configure logging
+configure_logging()
+logger = logging.getLogger(__name__)
+
+# Use the custom level
+logger.audit("User 'admin' modified system settings")
+```
+
+## The Retry Mechanism with Logging
+
+The logging system integrates with the retry mechanism to provide visibility into retry attempts:
+
+```python
+@async_retry(max_retries=3, base_delay=1, max_delay=10)
+async def call_external_api(url, params):
+    """Call an external API with retry logic."""
+    logger = logging.getLogger(__name__)
+    
+    try:
+        logger.info(f"Calling external API at {url}")
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params) as response:
+                if response.status != 200:
+                    logger.warning(f"API call failed with status {response.status}")
+                    response.raise_for_status()
+                return await response.json()
+    except Exception as e:
+        logger.error(f"API call failed: {str(e)}")
+        raise
+```
+
+In the retry decorator, the failed attempts are logged:
+
+```python
+def async_retry(max_retries=3, base_delay=1, max_delay=60, backoff_factor=2):
+    """Decorator for retrying async functions with exponential backoff."""
+    def decorator(func):
+        @functools.wraps(func)
+        async def wrapper(*args, **kwargs):
+            logger = logging.getLogger(func.__module__)
+            retries = 0
+            delay = base_delay
+            
+            while True:
+                try:
+                    return await func(*args, **kwargs)
+                except Exception as e:
+                    retries += 1
+                    if retries > max_retries:
+                        logger.error(f"Max retries ({max_retries}) exceeded for {func.__name__}")
+                        raise
+                        
+                    delay = min(delay * backoff_factor, max_delay)
+                    logger.warning(
+                        f"Function {func.__name__} failed with {type(e).__name__}: {str(e)}. "
+                        f"Retrying in {delay} seconds (attempt {retries}/{max_retries})."
+                    )
+                    await asyncio.sleep(delay)
+        return wrapper
+    return decorator
+```
+
+## Best Practices
+
+1. **Consistent Logging**: Use the centralized logging configuration throughout the application
+2. **Appropriate Log Levels**: Choose the correct log level based on the message importance
+3. **Contextual Information**: Include relevant context in log messages
+4. **Structured Data**: Use structured formats for complex data rather than string concatenation
+5. **Exception Logging**: Always log exceptions with tracebacks
+6. **Performance Awareness**: Be mindful of the performance impact of verbose logging
+7. **Sensitive Data**: Never log sensitive information like passwords or API keys
+8. **Testing Logs**: Include logging checks in tests to ensure proper log generation
+9. **Log Rotation**: Configure log rotation to manage disk space
+10. **Log Analysis**: Periodically review logs to identify patterns and issues
+
+## Related Components
+
+- **Configuration Module**: Provides settings for the logging system
+- **Graph Engine**: Logs state transitions and node execution
+- **Agent Tools**: Log tool invocations and results
+- **Error Handling**: Uses logging for error reporting
+- **Utility Functions**: Include logging for diagnostic purposes 

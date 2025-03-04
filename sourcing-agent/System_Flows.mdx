@@ -1,0 +1,625 @@
+---
+title: 'System Flows'
+description: 'Detailed system-level flow diagrams and process documentation'
+icon: 'diagram-project'
+---
+
+# System Flows Documentation
+
+This document provides comprehensive flow diagrams for the Agent System, showing both module-level internal flows and inter-module interactions.
+
+## Table of Contents
+
+1. [Module-Level Flows](#module-level-flows)
+   - [Configuration Module](#configuration-module-flow)
+   - [State Management Module](#state-management-module-flow)
+   - [Graph Engine Module](#graph-engine-module-flow)
+   - [Agent Tools Module](#agent-tools-module-flow)
+   - [Prompt Management Module](#prompt-management-module-flow)
+   - [Logging System Module](#logging-system-module-flow)
+   - [Utility Functions Module](#utility-functions-module-flow)
+2. [Inter-Module Flows](#inter-module-flows)
+   - [Complete Agent Workflow](#complete-agent-workflow)
+   - [Research Process Flow](#research-process-flow)
+   - [Market Analysis Flow](#market-analysis-flow)
+   - [Error Handling Flow](#error-handling-flow)
+   - [Web Search and Analysis Flow](#web-search-and-analysis-flow)
+   - [Tool Execution Flow](#tool-execution-flow)
+
+## Module-Level Flows
+
+This section shows the internal flows within each module, illustrating how components within a module interact.
+
+### Configuration Module Flow
+
+The initialization and usage flow of the Configuration module:
+
+```mermaid
+sequenceDiagram
+    participant Client as Client Code
+    participant Config as Configuration Class
+    participant Env as Environment Variables
+    participant Validation as Validation Methods
+    participant Cache as Config Cache
+
+    Client->>Config: Initialize Configuration()
+    Config->>Env: Load environment variables
+    Env-->>Config: Return environment values
+    Config->>Config: Apply type conversions
+    Config->>Validation: _validate_configuration()
+    Validation->>Validation: Check required settings
+    Validation->>Validation: Validate value ranges
+    Validation-->>Config: Validation result
+    Config->>Cache: Store in singleton cache
+    Config-->>Client: Return configuration instance
+    
+    Note over Client,Cache: Subsequent usage
+    Client->>Config: Request config value
+    Config->>Cache: Check if value in cache
+    Cache-->>Config: Return cached value
+    Config-->>Client: Return requested value
+```
+
+### State Management Module Flow
+
+The flow of state creation, validation, and transformation:
+
+```mermaid
+sequenceDiagram
+    participant Client as Client Code
+    participant Init as initialize_agent_state
+    participant State as AgentState
+    participant Validate as validate_agent_state
+    participant Transform as create_new_agent_state
+    participant Serial as Serialization Functions
+
+    Client->>Init: initialize_agent_state(category, config)
+    Init->>State: Create AgentState
+    State->>State: Initialize default values
+    State-->>Init: Return new state
+    Init-->>Client: Return initialized state
+    
+    Client->>Validate: validate_agent_state(state)
+    Validate->>Validate: Check field types
+    Validate->>Validate: Verify required fields
+    Validate-->>Client: Return (is_valid, errors)
+    
+    Client->>Transform: create_new_agent_state(state)
+    Transform->>State: Deep copy state data
+    Transform->>Transform: Update metadata
+    Transform-->>Client: Return new state
+    
+    Client->>Serial: serialize_agent_state(state)
+    Serial->>Serial: Convert to dictionary
+    Serial-->>Client: Return serializable dict
+    
+    Client->>Serial: deserialize_agent_state(data)
+    Serial->>State: Create from dictionary
+    Serial-->>Client: Return AgentState
+```
+
+### Graph Engine Module Flow
+
+The flow of graph creation and execution:
+
+```mermaid
+sequenceDiagram
+    participant Client as Client Code
+    participant Create as create_graph
+    participant BaseGraph as create_base_graph
+    participant StateGraph as StateGraph
+    participant Nodes as Node Functions
+    participant Edges as Edge Functions
+    participant Run as invoke_graph
+    participant Handler as Error Handler
+
+    Client->>Create: create_graph(config)
+    Create->>BaseGraph: create_base_graph(config)
+    BaseGraph->>StateGraph: Initialize StateGraph()
+    BaseGraph->>StateGraph: Add main_node
+    BaseGraph->>StateGraph: Add research_node
+    BaseGraph->>StateGraph: Add market_node
+    BaseGraph->>StateGraph: Add reflection_node
+    BaseGraph->>StateGraph: Add finalization_node
+    BaseGraph->>StateGraph: Add error_handler_node
+    BaseGraph->>Edges: Define conditional edges
+    BaseGraph-->>Create: Return base graph
+    Create->>Create: Add additional configuration
+    Create-->>Client: Return AgentRunnable
+    
+    Client->>Run: invoke_graph(input_data)
+    Run->>StateGraph: Start graph execution
+    StateGraph->>Nodes: Execute main_node
+    Nodes-->>StateGraph: Return updated state
+    
+    alt Based on edge conditions
+        StateGraph->>Nodes: Execute research_node
+        Nodes-->>StateGraph: Return updated state
+    else Error occurs
+        Nodes->>Handler: Handle error
+        Handler-->>StateGraph: Return recovery state
+    end
+    
+    StateGraph->>Nodes: Continue execution...
+    Nodes-->>StateGraph: Final state
+    StateGraph-->>Run: Completed state
+    Run-->>Client: Return results
+```
+
+### Agent Tools Module Flow
+
+The flow of tool registration, selection, and execution:
+
+```mermaid
+sequenceDiagram
+    participant Client as Tool User
+    participant Registry as Tool Registry
+    participant Decorator as create_tool Decorator
+    participant Tools as Tool Functions
+    participant LLM as Language Model
+    participant Execution as Tool Execution Logic
+    participant External as External Services
+
+    Note over Decorator,Tools: Tool Registration Phase
+    Decorator->>Registry: Register tool metadata
+    Decorator->>Tools: Decorate tool function
+    
+    Note over Client,External: Tool Usage Phase
+    Client->>LLM: Provide task with tool context
+    LLM->>Registry: Query available tools
+    Registry-->>LLM: Return tool definitions
+    LLM->>LLM: Select appropriate tool
+    LLM->>Execution: Execute selected tool
+    Execution->>Tools: Call tool function
+    
+    alt Web search tool
+        Tools->>External: Make API request
+        External-->>Tools: Return search results
+        Tools->>Tools: Process results
+    else Analysis tool
+        Tools->>Tools: Analyze provided data
+    else Utility tool
+        Tools->>Tools: Perform utility operation
+    end
+    
+    Tools-->>Execution: Return tool results
+    Execution-->>LLM: Provide results
+    LLM-->>Client: Return response with tool output
+```
+
+### Prompt Management Module Flow
+
+The flow of prompt template creation and rendering:
+
+```mermaid
+sequenceDiagram
+    participant Client as Prompt User
+    participant Template as PromptTemplate
+    participant Variables as Variable Processing
+    participant Renderer as Template Renderer
+    participant Context as Context Management
+    participant Format as Formatting Functions
+
+    Client->>Template: Create PromptTemplate(template, required_vars, optional_vars)
+    Template->>Template: Store template string
+    Template->>Template: Extract variables from template
+    Template->>Template: Validate required variables exist in template
+    Template-->>Client: Return template instance
+    
+    Client->>Template: Render prompt(variable_values)
+    Template->>Variables: Check for missing required variables
+    Variables->>Variables: Combine with default values
+    Variables-->>Template: Return complete variables
+    Template->>Renderer: Format template with variables
+    Renderer-->>Template: Return rendered prompt
+    Template-->>Client: Return final prompt
+    
+    Client->>Context: format_research_context(results)
+    Context->>Format: Format each result
+    Context->>Context: Combine formatted results
+    Context->>Context: truncate_context(text, max_tokens)
+    Context-->>Client: Return formatted context
+```
+
+### Logging System Module Flow
+
+The flow of logging system configuration and usage:
+
+```mermaid
+sequenceDiagram
+    participant Client as Client Code
+    participant Configure as configure_logging
+    participant Root as Root Logger
+    participant Handlers as Log Handlers
+    participant Filter as TraceID Filter
+    participant Formatter as Log Formatter
+    participant Trace as Trace Context
+    participant Log as Logging Functions
+
+    Client->>Configure: configure_logging(log_level, enable_file)
+    Configure->>Configure: Get configuration
+    Configure->>Configure: Set log levels
+    Configure->>Handlers: Create console handler
+    Configure->>Filter: Create TraceID filter
+    Configure->>Formatter: Create log formatter
+    Handlers->>Filter: Add filter
+    Handlers->>Formatter: Set formatter
+    
+    alt File logging enabled
+        Configure->>Handlers: Create file handler
+        Handlers->>Filter: Add filter
+        Handlers->>Formatter: Set formatter
+    end
+    
+    Configure->>Root: Set handlers
+    Configure-->>Client: Return configured logger
+    
+    Client->>Trace: set_trace_id()
+    Trace-->>Client: Return token
+    
+    Client->>Log: logger.info(message)
+    Log->>Filter: Apply filters
+    Filter->>Filter: Add trace_id to record
+    Log->>Handlers: Send to handlers
+    Handlers->>Formatter: Format message
+    Handlers->>Handlers: Output log entry
+    
+    Client->>Trace: clear_trace_id(token)
+```
+
+### Utility Functions Module Flow
+
+The flow of key utility functions:
+
+```mermaid
+sequenceDiagram
+    participant Client as Client Code
+    participant Retry as async_retry Decorator
+    participant Function as Decorated Function
+    participant HTTP as make_http_request
+    participant Session as HTTP Session
+    participant External as External Service
+    participant Data as Data Processing Utils
+    participant Error as Error Handling
+    
+    Client->>Function: Call function with retry
+    Retry->>Function: Attempt execution
+    
+    alt Function succeeds
+        Function-->>Retry: Return result
+        Retry-->>Client: Return result
+    else Function fails
+        Function->>Retry: Raise exception
+        Retry->>Retry: Calculate backoff
+        Retry->>Retry: Log retry attempt
+        Retry->>Retry: Sleep (delay)
+        Retry->>Function: Retry execution
+        Function-->>Retry: Return result
+        Retry-->>Client: Return result
+    end
+    
+    Client->>HTTP: make_http_request(url, method, params)
+    HTTP->>Session: Create client session
+    HTTP->>External: Send request
+    External-->>HTTP: Return response
+    HTTP->>HTTP: Check status code
+    HTTP->>HTTP: Process response
+    HTTP-->>Client: Return processed data
+    
+    Client->>Data: deep_merge(dict1, dict2)
+    Data->>Data: Recursively merge dictionaries
+    Data-->>Client: Return merged dictionary
+    
+    Client->>Error: Using handle_agent_errors decorator
+    Error->>Function: Try function execution
+    
+    alt Function succeeds
+        Function-->>Error: Return result
+        Error-->>Client: Return result
+    else Function fails
+        Function->>Error: Raise exception
+        Error->>Error: Log error
+        Error->>Error: Create error state
+        Error-->>Client: Return error state
+    end
+```
+
+## Inter-Module Flows
+
+This section illustrates how different modules interact with each other to accomplish system-level processes.
+
+### Complete Agent Workflow
+
+The end-to-end flow of a complete agent execution:
+
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Config as Configuration
+    participant Graph as Graph Engine
+    participant State as State Management
+    participant Tools as Agent Tools
+    participant Prompts as Prompt Management
+    participant Logging as Logging System
+    participant Utils as Utility Functions
+    
+    Client->>Config: Create Configuration()
+    Config-->>Client: Return config instance
+    
+    Client->>State: initialize_agent_state(category, config)
+    State-->>Client: Return initial state
+    
+    Client->>Graph: create_graph(config)
+    Graph-->>Client: Return agent graph
+    
+    Client->>Graph: invoke_graph(state)
+    Graph->>Logging: Log graph execution start
+    Graph->>State: Get current state
+    
+    loop Each Node Execution
+        Graph->>Graph: Select next node
+        Graph->>Prompts: Get prompt template
+        Prompts->>Prompts: Render prompt
+        Prompts-->>Graph: Return rendered prompt
+        
+        Graph->>Tools: Select and execute tools
+        Tools->>Utils: Use utility functions
+        Utils-->>Tools: Return utility results
+        Tools->>Utils: Make HTTP requests with retry
+        Utils-->>Tools: Return HTTP results
+        Tools-->>Graph: Return tool results
+        
+        Graph->>State: Update state with results
+        State->>State: Validate updated state
+        State-->>Graph: Return new state
+        
+        Graph->>Logging: Log node completion
+    end
+    
+    Graph->>State: Get final state
+    Graph-->>Client: Return results
+```
+
+### Research Process Flow
+
+The detailed flow of the research process across modules:
+
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Graph as Graph Engine
+    participant Research as research_node
+    participant State as State Management
+    participant Config as Configuration
+    participant LLM as Language Model
+    participant Tools as Research Tools
+    participant Execute as execute_research_tools
+    participant Analyze as analyze_research_results
+    participant HTTP as HTTP Utilities
+    participant Logging as Logging System
+    
+    Client->>Graph: invoke_graph(state)
+    Graph->>Research: Execute research_node(state)
+    Research->>State: Create new state copy
+    Research->>Config: Get configuration
+    Research->>Logging: Log research start
+    
+    Research->>LLM: Initialize LLM with config
+    Research->>Tools: create_research_tools(config)
+    Research->>LLM: Bind tools to LLM
+    
+    Research->>Execute: execute_research_tools(llm, topic, category)
+    Execute->>LLM: Determine needed research
+    
+    loop For each research query
+        Execute->>Tools: Execute search tool
+        Tools->>HTTP: Make HTTP request
+        HTTP-->>Tools: Return response
+        Tools->>Tools: Process search results
+        Tools-->>Execute: Return tool results
+    end
+    
+    Execute-->>Research: Return all tool results
+    
+    Research->>Analyze: analyze_research_results(llm, results, topic)
+    Analyze->>LLM: Generate analysis of results
+    Analyze-->>Research: Return analysis
+    
+    Research->>Research: Update topic with analysis
+    Research->>State: Update research state
+    Research->>Logging: Log research completion
+    Research-->>Graph: Return updated state
+    Graph-->>Client: Return results
+```
+
+### Market Analysis Flow
+
+The flow of the market analysis process across modules:
+
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Graph as Graph Engine
+    participant Market as market_node
+    participant State as State Management
+    participant Config as Configuration
+    participant LLM as Language Model
+    participant Tools as Market Tools
+    participant Research as Research Results
+    participant Analysis as analyze_market_data
+    participant Suppliers as identify_suppliers
+    participant Logging as Logging System
+    
+    Client->>Graph: invoke_graph(state)
+    Graph->>Market: Execute market_node(state)
+    Market->>State: Create new state copy
+    Market->>Config: Get configuration
+    Market->>Logging: Log market analysis start
+    
+    Market->>Research: Get research results from state
+    Market->>LLM: Initialize LLM with config
+    Market->>Tools: create_market_tools(config)
+    Market->>LLM: Bind tools to LLM
+    
+    Market->>Analysis: analyze_market_data(llm, research_results, category)
+    Analysis->>LLM: Generate market analysis
+    Analysis-->>Market: Return market analysis
+    
+    Market->>Suppliers: identify_suppliers(llm, analysis, category)
+    Suppliers->>LLM: Extract supplier information
+    
+    loop For each potential supplier
+        Suppliers->>Tools: Validate supplier info
+        Tools-->>Suppliers: Return validation results
+    end
+    
+    Suppliers-->>Market: Return supplier list
+    
+    Market->>Market: Update market state with analysis and suppliers
+    Market->>Logging: Log market analysis completion
+    Market-->>Graph: Return updated state
+    Graph-->>Client: Return results
+```
+
+### Error Handling Flow
+
+The cross-module flow of error detection, reporting, and recovery:
+
+```mermaid
+sequenceDiagram
+    participant Node as Node Function
+    participant Utils as Utility Functions
+    participant Decorator as handle_agent_errors
+    participant Error as error_handler_node
+    participant State as State Management
+    participant Logging as Logging System
+    participant Retry as async_retry
+    participant Graph as Graph Engine
+    
+    Node->>Decorator: Function execution
+    
+    alt Execution succeeds
+        Decorator-->>Node: Return successful result
+    else Execution fails
+        Decorator->>Logging: Log error details
+        Decorator->>State: Create error state
+        Decorator->>Error: Redirect to error_handler_node
+        
+        Error->>Error: Examine error details
+        Error->>Logging: Log error handling attempt
+        
+        alt Recoverable error
+            Error->>Retry: Attempt function retry
+            
+            alt Retry succeeds
+                Retry-->>Error: Return recovery result
+                Error->>State: Update state with recovery
+                Error-->>Graph: Continue with recovered state
+            else Retry fails
+                Retry->>Error: Report retry failure
+                Error->>State: Mark error as unrecoverable
+                Error-->>Graph: Return error state
+            end
+            
+        else Unrecoverable error
+            Error->>State: Add error to state.errors
+            Error->>State: Set appropriate error flags
+            Error-->>Graph: Return error state
+        end
+    end
+    
+    Graph->>Graph: Determine next node based on state
+```
+
+### Web Search and Analysis Flow
+
+The detailed cross-module flow of web search and content analysis:
+
+```mermaid
+sequenceDiagram
+    participant Research as research_node
+    participant Tools as Agent Tools
+    participant WebSearch as web_search_tool
+    participant WebScrape as web_scrape_tool
+    participant HTTP as HTTP Utilities
+    participant Utils as Utility Functions
+    participant Brave as Brave Web API
+    participant BS as BeautifulSoup
+    participant Analysis as Content Analysis
+    participant State as State Management
+    
+    Research->>Tools: Execute web_search_tool(query)
+    Tools->>WebSearch: Process search request
+    WebSearch->>HTTP: make_http_request(search_api_url)
+    HTTP->>Utils: With async_retry
+    Utils->>Brave: Send search request
+    Brave-->>Utils: Return search results
+    Utils-->>HTTP: Return HTTP response
+    HTTP-->>WebSearch: Return processed results
+    WebSearch-->>Tools: Return search results
+    
+    Tools->>WebScrape: web_scrape_tool(url)
+    WebScrape->>HTTP: make_http_request(url)
+    HTTP->>Utils: With async_retry
+    Utils->>Brave: Send scrape request
+    Brave-->>Utils: Return HTML content
+    Utils-->>HTTP: Return HTTP response
+    HTTP-->>WebScrape: Return HTML data
+    
+    WebScrape->>BS: Parse HTML content
+    BS-->>WebScrape: Return parsed content
+    WebScrape->>WebScrape: Extract relevant elements
+    WebScrape-->>Tools: Return extracted content
+    
+    Tools->>Analysis: analyze_content(content)
+    Analysis->>Analysis: Extract key information
+    Analysis-->>Tools: Return analyzed data
+    
+    Tools-->>Research: Return all web data
+    Research->>State: Update state with web data
+```
+
+### Tool Execution Flow
+
+The detailed flow of tool selection, execution, and result processing:
+
+```mermaid
+sequenceDiagram
+    participant Node as Node Function
+    participant LLM as Language Model
+    participant Tools as Agent Tools
+    participant Registry as Tool Registry
+    participant Execution as Tool Execution
+    participant Utils as Utility Functions
+    participant External as External Service
+    participant State as State Management
+    
+    Node->>LLM: Provide task with available tools
+    LLM->>Registry: Query available tools
+    Registry-->>LLM: Return tool definitions
+    LLM->>LLM: Determine required tool
+    LLM->>Tools: Request tool execution
+    
+    Tools->>Registry: Look up tool implementation
+    Registry-->>Tools: Return tool function
+    
+    Tools->>Execution: Execute tool function
+    
+    alt External API tool
+        Execution->>Utils: make_http_request with retry
+        Utils->>External: Send API request
+        External-->>Utils: Return API response
+        Utils-->>Execution: Return processed response
+    else Data processing tool
+        Execution->>Execution: Process input data
+    else Analysis tool
+        Execution->>LLM: Request LLM for analysis
+        LLM-->>Execution: Return analysis result
+    end
+    
+    Execution-->>Tools: Return tool result
+    Tools-->>LLM: Provide tool results
+    LLM->>LLM: Incorporate results into reasoning
+    LLM-->>Node: Return response with tool output
+    Node->>State: Update state with results
+``` 
