@@ -1,0 +1,24 @@
+{
+  "id": "sourcing-agent/Configuration_Module",
+  "title": "Configuration Module",
+  "description": "Overview",
+  "source": "@site/docs/sourcing-agent/Configuration_Module.md",
+  "sourceDirName": "sourcing-agent",
+  "slug": "/sourcing-agent/Configuration_Module",
+  "permalink": "/docs/sourcing-agent/Configuration_Module",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/sourcing-agent/Configuration_Module.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Component Interfaces",
+    "permalink": "/docs/sourcing-agent/Component_Interfaces"
+  },
+  "next": {
+    "title": "Enhanced Retry Functionality",
+    "permalink": "/docs/sourcing-agent/Enhanced_Retry_Functionality"
+  }
+}

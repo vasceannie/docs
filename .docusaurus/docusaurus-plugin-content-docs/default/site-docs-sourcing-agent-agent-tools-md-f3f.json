@@ -1,0 +1,24 @@
+{
+  "id": "sourcing-agent/Agent_Tools",
+  "title": "Agent Tools Module",
+  "description": "Overview",
+  "source": "@site/docs/sourcing-agent/Agent_Tools.md",
+  "sourceDirName": "sourcing-agent",
+  "slug": "/sourcing-agent/Agent_Tools",
+  "permalink": "/docs/sourcing-agent/Agent_Tools",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/sourcing-agent/Agent_Tools.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Sourcing Agent Documentation",
+    "permalink": "/docs/sourcing-agent/"
+  },
+  "next": {
+    "title": "Architecture Flows",
+    "permalink": "/docs/sourcing-agent/Architecture_Flows"
+  }
+}

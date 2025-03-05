@@ -1,0 +1,24 @@
+{
+  "id": "sourcing-agent/Architecture_Flows",
+  "title": "Architecture Flows",
+  "description": "This document provides detailed flow diagrams illustrating the interactions, inputs/outputs, and dependencies for each component of the Agent System.",
+  "source": "@site/docs/sourcing-agent/Architecture_Flows.md",
+  "sourceDirName": "sourcing-agent",
+  "slug": "/sourcing-agent/Architecture_Flows",
+  "permalink": "/docs/sourcing-agent/Architecture_Flows",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/sourcing-agent/Architecture_Flows.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Agent Tools Module",
+    "permalink": "/docs/sourcing-agent/Agent_Tools"
+  },
+  "next": {
+    "title": "Component Interfaces",
+    "permalink": "/docs/sourcing-agent/Component_Interfaces"
+  }
+}

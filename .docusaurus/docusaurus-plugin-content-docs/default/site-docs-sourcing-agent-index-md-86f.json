@@ -1,0 +1,24 @@
+{
+  "id": "sourcing-agent/index",
+  "title": "Sourcing Agent Documentation",
+  "description": "Welcome to the comprehensive documentation for the Sourcing Agent system. This documentation provides detailed information about the architecture, components, and flows of the agent system.",
+  "source": "@site/docs/sourcing-agent/index.md",
+  "sourceDirName": "sourcing-agent",
+  "slug": "/sourcing-agent/",
+  "permalink": "/docs/sourcing-agent/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/docs/sourcing-agent/index.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Translate your site",
+    "permalink": "/docs/tutorial-extras/translate-your-site"
+  },
+  "next": {
+    "title": "Agent Tools Module",
+    "permalink": "/docs/sourcing-agent/Agent_Tools"
+  }
+}
