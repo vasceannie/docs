@@ -1,0 +1,213 @@
+---
+title: 'Development Guide'
+description: 'Setup and workflow guide for Sourcing Agent development'
+---
+
+# Development Guide
+
+This guide provides detailed instructions for setting up the development environment and working with the Sourcing Agent codebase.
+
+## Setting Up the Development Environment
+
+### System Requirements
+
+- Python 3.12+
+- Node.js 20+ (for documentation)
+- Git
+
+### Initial Setup
+
+Clone the repository and set up the development environment using our Makefile:
+
+```bash
+# Clone the repository
+git clone https://github.com/RiseNow-Dev/sourcing-agent.git
+cd sourcing-agent
+
+# Run the setup script which includes:
+# - checking dependencies
+# - installing the uv package manager
+# - creating a virtual environment
+# - installing dependencies
+# - setting up npm and repomix
+make setup
+```
+
+Alternatively, you can follow these manual steps:
+
+```bash
+# Clone the repository
+git clone https://github.com/RiseNow-Dev/sourcing-agent.git
+cd sourcing-agent
+
+# Install uv package manager
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create a Python virtual environment
+uv venv -p 3.12
+
+# Activate the virtual environment
+source .venv/bin/activate
+
+# Install dependencies
+uv pip install "langgraph-cli[inmem]"
+```
+
+### Environment Variables
+
+Copy the example environment file and update it with your settings:
+
+```bash
+cp .env.example .env
+```
+
+Edit the `.env` file to include your API keys and configuration settings.
+
+## Development Workflow
+
+### Code Formatting and Linting
+
+We use `ruff` for code formatting and linting. Run the following commands to ensure your code meets our standards:
+
+```bash
+# Format code
+make format
+
+# Run linters
+make lint
+```
+
+### Running Tests
+
+Run the test suite to ensure your changes don't break existing functionality:
+
+```bash
+# Run all unit tests
+make test
+
+# Run integration tests
+make integration_tests
+
+# Run tests with coverage reporting
+make test_coverage
+
+# Run tests with HTML coverage report
+make test_coverage_html
+```
+
+### Project Structure
+
+The Sourcing Agent project has the following structure:
+
+```
+sourcing-agent/
+├── documentation/      # Documentation files
+├── examples/           # Example code and usage examples
+├── src/                # Source code
+│   └── agent/          # Agent implementation
+│       ├── checkpoints/    # State persistence
+│       ├── cli/            # Command-line interfaces
+│       ├── config/         # Configuration management
+│       ├── core/           # Core framework components
+│       ├── nodes/          # Node implementations
+│       ├── prompts/        # Prompt templates
+│       ├── reflection/     # Self-assessment mechanisms
+│       ├── services/       # External service integrations
+│       ├── subgraphs/      # Reusable graph components
+│       ├── supervisors/    # Agent orchestration
+│       ├── tools/          # Tool implementations
+│       └── utils/          # Utility functions
+├── tests/              # Test suite
+│   ├── integration_tests/  # Integration tests
+│   └── unit_tests/         # Unit tests
+└── workflows/          # CI/CD workflows
+```
+
+To visualize the project structure, you can use:
+
+```bash
+# Show project structure
+make tree
+
+# Show Python files structure
+make tree-py
+
+# Show tests structure
+make tree-tests
+```
+
+## Building the Documentation
+
+The documentation is built using Mintlify. To preview the documentation locally:
+
+1. Install Mintlify CLI:
+   ```bash
+   npm i -g mintlify
+   ```
+
+2. Start the documentation server:
+   ```bash
+   cd documentation
+   mintlify dev
+   ```
+
+The documentation will be available at `http://localhost:3000`.
+
+## Contribution Guidelines
+
+### Branch Strategy
+
+1. Create a new branch for each feature or bugfix:
+   ```bash
+   git checkout -b feature/my-new-feature
+   ```
+
+2. Keep your branches focused on a single task.
+
+3. Regularly pull from the main branch to stay up-to-date.
+
+### Pull Request Process
+
+1. Ensure all tests pass locally.
+2. Update documentation to reflect your changes.
+3. Submit a pull request with a clear description of the changes.
+
+### Code Review Guidelines
+
+- Address all review comments.
+- Maintain code quality standards.
+- Ensure all CI checks pass.
+
+## Performance Testing
+
+For performance-critical components, we use benchmarks to track performance:
+
+```bash
+# Run benchmarks
+make test_benchmark
+
+# Compare with previous benchmark results
+make test_benchmark_compare
+```
+
+## Debugging Tips
+
+### Common Issues
+
+1. **Missing Dependencies**: If you encounter import errors, ensure you've installed all dependencies with `make install-deps`.
+
+2. **Environment Variables**: Many components require API keys or configuration values set in the `.env` file.
+
+3. **Type Errors**: We use strict typing. Run `make lint` to catch type issues early.
+
+### Debugging Tools
+
+- Use the built-in Python debugger or VS Code's debugger.
+- Enable DEBUG level logging by setting `LOG_LEVEL=DEBUG` in your `.env` file.
+- Use `make test_profile` to identify performance bottlenecks.
+
+## Additional Resources
+
+- [Technical Manual](./Technical_Manual) - Detailed technical documentation
+- [Architecture Flows](./Architecture_Flows) - Visual representation of system components
+- [Testing Framework](./Testing_Framework) - Details about our testing approach 

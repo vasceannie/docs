@@ -1,0 +1,234 @@
+---
+title: 'Contributing Guide'
+description: 'Guidelines for contributing to the Sourcing Agent project'
+---
+
+# Contributing to Sourcing Agent
+
+Thank you for your interest in contributing to the Sourcing Agent project! This document provides guidelines and instructions for contributing.
+
+## Code of Conduct
+
+All contributors are expected to adhere to our project's code of conduct:
+
+- Be respectful and inclusive
+- Provide constructive feedback
+- Focus on the best outcomes for the project
+- Maintain professionalism in all interactions
+
+## Getting Started
+
+### Prerequisites
+
+Before you start contributing, make sure you have:
+
+1. A GitHub account
+2. Git installed on your local machine
+3. Python 3.12 or higher
+4. Familiarity with our [Development Guide](./Development_Guide)
+
+### Setting Up Your Development Environment
+
+Follow the [Development Guide](./Development_Guide) to set up your local development environment.
+
+## Types of Contributions
+
+We welcome various types of contributions, including:
+
+- **Bug fixes**: Addressing existing issues
+- **Feature additions**: Implementing new functionality
+- **Documentation improvements**: Enhancing or correcting documentation
+- **Tests**: Adding or improving test coverage
+- **Performance improvements**: Optimizing existing code
+- **Refactoring**: Improving code quality without changing functionality
+
+## Contribution Process
+
+### 1. Find or Create an Issue
+
+Start by finding an existing issue to work on or create a new one if you've identified a bug or enhancement opportunity.
+
+When creating a new issue:
+- Use a clear, descriptive title
+- Provide detailed steps to reproduce if it's a bug
+- Include expected and actual behavior
+- Add screenshots if applicable
+- Mention your environment (OS, Python version, etc.)
+
+### 2. Fork the Repository
+
+Fork the Sourcing Agent repository to your GitHub account.
+
+```bash
+# Clone your fork
+git clone https://github.com/YOUR-USERNAME/sourcing-agent.git
+
+# Add the original repository as an upstream remote
+git remote add upstream https://github.com/RiseNow-Dev/sourcing-agent.git
+```
+
+### 3. Create a Branch
+
+Create a new branch for your contribution:
+
+```bash
+# Ensure you're starting from the latest main
+git checkout main
+git pull upstream main
+
+# Create a new branch
+git checkout -b feature/your-feature-name
+```
+
+Use a descriptive branch name that reflects the change you're making:
+- `feature/add-new-tool`
+- `fix/error-handling-bug`
+- `docs/improve-readme`
+
+### 4. Make Your Changes
+
+Implement your changes following our coding standards and guidelines:
+
+- Follow the [style guide](#coding-standards)
+- Write tests for new functionality
+- Update documentation to reflect your changes
+- Keep commits focused and atomic
+
+### 5. Test Your Changes
+
+Ensure all tests pass and that your changes don't introduce any regressions:
+
+```bash
+# Run the linters
+make lint
+
+# Run the tests
+make test
+
+# Run coverage checks
+make test_coverage
+```
+
+### 6. Commit Your Changes
+
+Make commits with clear, descriptive messages:
+
+```bash
+git add .
+git commit -m "Add search tool for Brave API integration"
+```
+
+Follow these commit message guidelines:
+- Use the present tense ("Add feature" not "Added feature")
+- Be descriptive but concise
+- Reference issue numbers if applicable ("Fix #123: Improve error handling")
+
+### 7. Push to Your Fork
+
+Push your changes to your fork on GitHub:
+
+```bash
+git push origin feature/your-feature-name
+```
+
+### 8. Submit a Pull Request
+
+Create a pull request from your branch to the main Sourcing Agent repository:
+
+1. Go to your fork on GitHub
+2. Select your branch
+3. Click "Pull Request"
+4. Fill out the PR template with details about your changes
+5. Link any related issues
+
+Your PR should:
+- Have a clear title and description
+- Detail what changes were made and why
+- Mention any breaking changes
+- Include any necessary migration steps
+
+### 9. Code Review
+
+After submitting your PR:
+- Maintainers will review your code
+- Address any requested changes
+- Respond to comments and questions
+- Update your PR with additional commits if needed
+
+### 10. Merge
+
+Once your PR is approved:
+- A maintainer will merge your PR
+- Your contributions will become part of the project
+- You'll be credited as a contributor
+
+## Coding Standards
+
+### Style Guide
+
+We follow these coding standards:
+
+- Use [ruff](https://github.com/charliermarsh/ruff) for linting and formatting
+- Follow [PEP 8](https://peps.python.org/pep-0008/) conventions
+- Use type hints for all function signatures
+- Keep line length to a maximum of 88 characters
+- Use descriptive variable and function names
+
+### Documentation
+
+All code should be well-documented:
+
+- Add docstrings to all functions, classes, and modules
+- Follow [Google-style docstrings](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
+- Update README and documentation to reflect changes
+- Include examples for new functionality
+
+### Testing
+
+All new code should include tests:
+
+- Write unit tests for new functions and classes
+- Add integration tests for new features
+- Ensure all tests pass before submitting a PR
+- Aim for high test coverage
+
+## Working with Issues
+
+### Issue Labels
+
+We use the following labels to categorize issues:
+
+- `bug`: Something isn't working as expected
+- `enhancement`: New feature or improvement
+- `documentation`: Documentation improvements
+- `good first issue`: Issues suitable for first-time contributors
+- `help wanted`: Issues where we need assistance
+- `in progress`: Issues being actively worked on
+
+### Issue Workflow
+
+1. **Triage**: New issues are reviewed and categorized
+2. **Assignment**: Issues are assigned to contributors
+3. **Implementation**: Assigned contributor works on the issue
+4. **Review**: Changes are reviewed by maintainers
+5. **Closure**: Issue is closed after the PR is merged
+
+## Getting Help
+
+If you need assistance:
+
+- Ask questions in the issue you're working on
+- Reach out to the maintainers
+- Check existing documentation and examples
+
+## Recognition
+
+We value all contributions and maintain a list of contributors in our README. Your contributions will be acknowledged!
+
+## Additional Resources
+
+- [Development Guide](./Development_Guide) - Setup and workflow information
+- [Technical Manual](./Technical_Manual) - Detailed technical documentation
+- [Testing Framework](./Testing_Framework) - Our approach to testing
+
+Thank you for contributing to the Sourcing Agent project! 

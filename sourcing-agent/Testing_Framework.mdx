@@ -1,0 +1,263 @@
+---
+title: 'Testing Framework'
+description: 'Comprehensive guide to testing approaches and practices for the Sourcing Agent project'
+---
+
+# Testing Framework
+
+This document outlines the testing framework and practices for the Sourcing Agent project.
+
+## Testing Principles
+
+The Sourcing Agent project follows these key testing principles:
+
+1. **Test-Driven Development**: We encourage writing tests before or alongside the implementation.
+2. **Comprehensive Coverage**: We aim for high test coverage to validate all logic paths.
+3. **Isolation**: Tests should be isolated and not depend on external services unless explicitly testing integration.
+4. **Reproducibility**: Tests should be deterministic and reproducible.
+5. **Performance**: Tests should be efficient and run quickly to encourage frequent testing.
+
+## Test Types
+
+### Unit Tests
+
+Unit tests focus on testing individual components in isolation. They make up the majority of our test suite and validate the behavior of specific functions, classes, or methods.
+
+```python
+# Example unit test
+def test_state_validation():
+    """Test that state validation correctly identifies invalid states."""
+    # Arrange
+    state = {"messages": [], "count": -1}  # Invalid count
+    
+    # Act
+    result = is_valid_state(state)
+    
+    # Assert
+    assert result is False
+```
+
+### Integration Tests
+
+Integration tests validate that different components work together correctly. They test the interaction between components and ensure proper data flow.
+
+```python
+# Example integration test
+def test_graph_execution_with_tools():
+    """Test that graph execution correctly integrates with tools."""
+    # Arrange
+    graph = build_test_graph()
+    state = {"query": "test query", "results": []}
+    
+    # Act
+    result = graph.process(state)
+    
+    # Assert
+    assert len(result["results"]) > 0
+    assert "search_results" in result
+```
+
+### Functional Tests
+
+Functional tests validate complete features or workflows from a user's perspective. They ensure that the system behaves as expected for specific use cases.
+
+```python
+# Example functional test
+def test_research_workflow():
+    """Test the complete research workflow from query to results."""
+    # Arrange
+    agent = ResearchAgent()
+    query = "What is the capital of France?"
+    
+    # Act
+    result = agent.run(query)
+    
+    # Assert
+    assert "Paris" in result.answer
+    assert len(result.sources) > 0
+```
+
+### Performance Tests
+
+Performance tests evaluate the system's performance characteristics, such as response time, throughput, and resource usage.
+
+```python
+# Example performance test
+@pytest.mark.benchmark
+def test_search_performance(benchmark):
+    """Test the performance of the search functionality."""
+    # Arrange
+    query = "performance testing query"
+    
+    # Act & Assert
+    result = benchmark(lambda: search_tool.run(query))
+    assert len(result) > 0
+    assert benchmark.stats.mean < 2.0  # Should take less than 2 seconds on average
+```
+
+## Testing Tools
+
+The Sourcing Agent project uses the following testing tools:
+
+- **pytest**: The primary test runner and framework
+- **pytest-cov**: For measuring test coverage
+- **pytest-benchmark**: For performance testing
+- **pytest-watch**: For continuous test execution during development
+- **mypy**: For static type checking
+
+## Running Tests
+
+### Basic Test Execution
+
+```bash
+# Run all unit tests
+make test
+
+# Run integration tests
+make integration_tests
+
+# Run tests with coverage reporting
+make test_coverage
+
+# Run tests with HTML coverage report
+make test_coverage_html
+```
+
+### Targeted Test Execution
+
+```bash
+# Run a specific test file
+make test TEST_FILE=tests/unit_tests/test_state.py
+
+# Run a specific test
+python -m pytest tests/unit_tests/test_state.py::test_state_validation
+```
+
+### Continuous Testing
+
+During development, you can use `pytest-watch` to automatically run tests when files change:
+
+```bash
+make test_watch
+```
+
+## Test Coverage
+
+We aim for high test coverage to ensure that our code is thoroughly tested. The coverage reports help identify untested or undertested code paths.
+
+```bash
+# Generate coverage report
+make test_coverage
+
+# Generate HTML coverage report
+make test_coverage_html
+```
+
+Coverage reports are also generated during CI/CD pipeline execution.
+
+## Mocking
+
+For dependencies that require external services or resources, we use mocking to isolate tests. The project follows these mocking guidelines:
+
+1. **Define Mocks in conftest.py**: All shared mocks should be defined in the appropriate conftest.py file.
+2. **Use Fixture Composition**: Build complex mocks by composing simpler fixtures.
+3. **Prefer Explicit Mocks**: Make mocks as explicit as possible to avoid hidden dependencies.
+
+```python
+# Example mock in conftest.py
+@pytest.fixture
+def mock_search_service():
+    """Mock the search service."""
+    with patch("agent.services.search.SearchService") as mock:
+        mock.search.return_value = [
+            {"title": "Test Result", "url": "https://example.com", "snippet": "Test snippet"}
+        ]
+        yield mock
+```
+
+## Test Data
+
+Test data should be:
+
+1. **Representative**: Reflect real-world usage patterns
+2. **Diverse**: Cover edge cases and corner conditions
+3. **Minimal**: Use the smallest dataset that validates the functionality
+4. **Stable**: Avoid relying on changing external data sources
+
+```python
+# Example test data
+TEST_QUERIES = [
+    "simple query",
+    "query with special characters: !@#$%^",
+    "",  # Empty query
+    "a" * 1000,  # Very long query
+]
+
+@pytest.mark.parametrize("query", TEST_QUERIES)
+def test_query_processing(query):
+    """Test that query processing handles various input types."""
+    # Test implementation
+```
+
+## CI/CD Integration
+
+Tests are automatically run in the CI/CD pipeline for every pull request and merge to the main branch. The pipeline:
+
+1. Runs all unit tests
+2. Runs integration tests
+3. Generates coverage reports
+4. Runs static analysis tools
+5. Verifies benchmark performance
+
+## Writing Good Tests
+
+When writing tests for the Sourcing Agent project, follow these guidelines:
+
+1. **Clear Naming**: Use descriptive names that convey the purpose of the test
+2. **Arrange-Act-Assert Pattern**: Structure tests with clear setup, action, and verification phases
+3. **One Assertion Per Test**: Focus each test on a single behavior
+4. **Test Edge Cases**: Include tests for boundary conditions and error scenarios
+5. **Document Test Purpose**: Include docstrings that explain the test's purpose
+
+```python
+def test_retry_mechanism_with_exponential_backoff():
+    """
+    Test that the retry mechanism uses exponential backoff.
+    
+    This test verifies that:
+    1. The retry interval increases exponentially
+    2. The retry count is properly tracked
+    3. The final result is returned after successful execution
+    """
+    # Test implementation
+```
+
+## Handling Flaky Tests
+
+Flaky tests (tests that inconsistently pass or fail) undermine confidence in the test suite. To handle flaky tests:
+
+1. **Identify Flaky Tests**: Use pytest's `--flake-finder` mode to identify flaky tests
+2. **Isolate Root Causes**: Debug to determine why the test is flaky
+3. **Fix or Mark**: Either fix the underlying issue or mark the test as flaky if it can't be immediately fixed
+4. **Add Stability Controls**: Implement appropriate waits, retries, or isolation mechanisms
+
+```python
+@pytest.mark.flaky(reruns=3, reruns_delay=2)
+def test_potentially_flaky_network_operation():
+    """Test that might be flaky due to network conditions."""
+    # Test implementation
+```
+
+## Test Automation
+
+Automated tests should run:
+
+1. **Locally**: During development to catch issues early
+2. **In CI/CD**: To validate changes before merging
+3. **Scheduled**: Regular test runs to catch environment or dependency issues
+
+## Additional Resources
+
+- [Development Guide](./Development_Guide) - Setup and workflow information
+- [Technical Manual](./Technical_Manual) - Detailed technical documentation
+- [pytest Documentation](https://docs.pytest.org/) - Official pytest documentation 

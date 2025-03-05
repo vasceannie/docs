@@ -1,29 +1,64 @@
 ---
 title: 'Sourcing Agent Documentation'
-description: 'Complete documentation for the Sourcing Agent system'
+description: 'Comprehensive documentation for the LangGraph-Aligned Agent Framework'
 icon: 'home'
 ---
 
 # Sourcing Agent Documentation
 
-Welcome to the comprehensive documentation for the Sourcing Agent system. This documentation provides detailed information about the architecture, components, and flows of the agent system.
+Welcome to the comprehensive documentation for the Sourcing Agent system - a graph-based agent framework aligned with LangGraph's architecture and patterns.
+
+## Overview
+
+The Sourcing Agent is a powerful framework for building and deploying AI agents using a graph-based approach. It provides a structured way to create, compose, and orchestrate complex agent workflows with explicit state management and typed interfaces.
+
+### Key Features
+
+- **Graph-Based Architecture**: Build agent workflows as explicit graphs with nodes and edges
+- **Typed State Management**: Utilize TypedDict and annotation-based state handling
+- **Modular Components**: Compose complex behaviors from reusable node implementations
+- **Tool Integration**: Seamless integration with various tools and external services
+- **LangGraph Alignment**: Designed to be compatible with LangGraph patterns and concepts
+
+## Recent Enhancements
+
+### State Management
+
+- **TypedDict Instead of Pydantic**: Switched from Pydantic models to TypedDict for state representation, following LangGraph's approach
+- **Reducer Functions**: Added support for reducer functions via Annotated types, allowing specialized handling of state attributes
+- **State Channels**: Implemented state channels for communication between nodes
+
+### Graph Implementation
+
+- **Conditional Edges**: Added support for conditional transitions between nodes based on state evaluation
+- **START and END Constants**: Introduced explicit constants for graph entry and exit points
+- **Compilation Step**: Added a compilation step via the `compile()` method, matching LangGraph's pattern
+- **Entry and Exit Points**: Implemented explicit entry and finish points for graph execution
+
+### Agent Interfaces
+
+- **RunnableAgent**: Added a new agent implementation that wraps LangChain Runnables
+- **FunctionAgent**: Added a new agent implementation that wraps functions
+- **Generic Support**: Enhanced type safety with generic type parameters
 
 ## Documentation Sections
 
 ### Architecture and Design
 
-- [Architecture Flows](./Architecture_Flows.md) - Comprehensive flow diagrams showing how components interact
-- [Module Dependencies](./Module_Dependencies.md) - Visualizations of dependencies between modules and packages
-- [System Flows](./System_Flows.md) - Detailed system-level flow diagrams 
-- [Component Interfaces](./Component_Interfaces.md) - API references and interface specifications
+- [Architecture Flows](./Architecture_Flows) - Comprehensive flow diagrams showing how components interact
+- [Module Dependencies](./Module_Dependencies) - Visualizations of dependencies between modules and packages
+- [System Flows](./System_Flows) - Detailed system-level flow diagrams 
+- [Component Interfaces](./Component_Interfaces) - API references and interface specifications
 
 ### Core Components
 
-- **Graph Engine** - Manages the execution flow of the agent system using LangGraph patterns
-- **State Management** - Handles state creation, validation, and transformation with typesafe operations
-- **Agent Interface** - Provides standardized agent interfaces and implementations for different agent types
+- [Graph Engine](./Graph_Engine) - Manages the execution flow of the agent system using LangGraph patterns
+- [State Management](./State_Management) - Handles state creation, validation, and transformation with typesafe operations
+- [Agent Tools](./Agent_Tools) - Provides standardized agent interfaces and implementations for different agent types
 
 ### Node Types
+
+The Sourcing Agent system implements various specialized node types:
 
 - **Main Node** - Entry point for agent execution, determines workflow paths
 - **Research Node** - Handles research and information gathering using search tools
@@ -41,49 +76,14 @@ Welcome to the comprehensive documentation for the Sourcing Agent system. This d
 - **Storage Tools** - Tools for persisting and retrieving data
 - **Base Tool Framework** - Foundation for all tool implementations with standardized interfaces
 
-### Configuration and Settings
-
-- **Configuration Management** - Handles system configuration and settings
-- **Environment Configuration** - Manages environment-specific settings
-
-### Error Handling and Logging
-
-- **Error Management** - Strategies for handling errors and exceptions
-- **Logging System** - Logging mechanisms and strategies
-- **Retry Statistics** - Tracking system for monitoring retry operations
-
-## Implementation Status
-
-The following components have been implemented:
-
-- **Core Framework**:
-  - Graph implementation with node and edge management
-  - State management with validation and transformation
-  - Agent interfaces and base implementations
-
-- **Tools**:
-  - Base tool framework with standard interfaces
-  - Search tools for web information retrieval
-  - Evaluation tools for content assessment
-  - Tool registry for centralized tool management
-
-- **Nodes**:
-  - Node interfaces with standardized signatures
-  - Basic node implementations
-
-Components in progress:
-
-- **Advanced Node Logic**:
-  - Deep implementation of node processing logic
-  - Cross-node state management
-
-- **Integration Services**:
-  - External API integrations
-  - Database connectors
-
 ## Getting Started
 
-To get started with the Sourcing Agent system, we recommend first understanding the overall architecture and flow of the system by reading the [Architecture Flows](./Architecture_Flows.md) documentation.
+To get started with the Sourcing Agent system, we recommend:
+
+1. First, read the [Technical Manual](./Technical_Manual) to understand the system architecture
+2. Explore the [Development Guide](./Development_Guide) for setup and development workflows
+3. Understand the [Graph Engine](./Graph_Engine) to learn how to construct agent workflows
+4. Review the [System Flows](./System_Flows) to see how components interact in real scenarios
 
 ## Development Guidelines
 

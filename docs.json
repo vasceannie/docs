@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "@sourcing-agent",
+  "name": "Sourcing Agent",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
@@ -26,8 +26,8 @@
             "pages": [
               "sourcing-agent/Modules_Core",
               "sourcing-agent/Graph_Engine",
-              "sourcing-agent/Agent_Tools",
-              "sourcing-agent/State_Management"
+              "sourcing-agent/State_Management",
+              "sourcing-agent/Agent_Tools"
             ]
           },
           {
@@ -48,6 +48,14 @@
               "sourcing-agent/Utility_Functions",
               "sourcing-agent/Enhanced_Retry_Functionality",
               "sourcing-agent/brave_api_integration"
+            ]
+          },
+          {
+            "group": "Development",
+            "pages": [
+              "sourcing-agent/Development_Guide",
+              "sourcing-agent/Testing_Framework",
+              "sourcing-agent/Contributing"
             ]
           }
         ]
