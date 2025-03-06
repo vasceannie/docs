@@ -1,0 +1,118 @@
+---
+title: 'Documentation Management Tools'
+description: 'Tools for managing and maintaining code-linked documentation'
+---
+
+# Documentation Management Tools
+
+The Sourcing Agent project includes a set of tools for managing documentation and maintaining links between source code and documentation files. These tools help ensure that documentation stays up-to-date with the codebase.
+
+## Overview
+
+The documentation management system consists of two main components:
+
+1. **DocLinker**: Handles finding and validating code references in documentation files
+2. **DocGenerator**: Generates and updates documentation files based on the codebase
+
+These tools are designed to work with the existing documentation system (Mintlify) and can be used to automatically maintain code references.
+
+## Code References
+
+Throughout the documentation, you can link to source code files using the following syntax:
+
+```
+
+```
+
+For example: `[code:agent/tools/base.py]` would link to the base.py tool file.
+
+## Configuration
+The agent uses TypedDict-based configuration management. See here: `[code:agent/config/configuration.py]`
+
+These references are validated by the documentation management tools to ensure they point to existing code files.
+
+## Using the Documentation Tools
+
+The documentation tools can be accessed through the `update_docs.py` script in the `management/scripts` directory.
+
+### Checking for Broken Links
+
+To check for broken code references without updating any files:
+
+```bash
+python -m management.scripts.update_docs --check
+```
+
+This will scan all documentation files for code references and verify that they point to existing files. If any broken links are found, they will be reported.
+
+To get more detailed output, use the `--verbose` flag:
+
+```bash
+python -m management.scripts.update_docs --check --verbose
+```
+
+### Generating Documentation
+
+To generate or update documentation based on the codebase:
+
+```bash
+python -m management.scripts.update_docs
+```
+
+This will:
+1. Scan the codebase for Python files
+2. Create or update documentation files with proper code references
+3. Ensure all documentation is linked to the corresponding code
+
+For verbose output:
+
+```bash
+python -m management.scripts.update_docs --verbose
+```
+
+## How It Works
+
+### DocLinker
+
+The `DocLinker` class is responsible for:
+
+- Finding code references in documentation files
+- Validating that referenced code files exist
+- Providing access to code files for documentation generation
+
+It uses a regular expression pattern to identify code references and maps them to actual file paths in the codebase.
+
+### DocGenerator
+
+The `DocGenerator` class handles:
+
+- Generating documentation files for code files
+- Updating existing documentation with proper code references
+- Extracting docstrings and code content for documentation
+- Maintaining a clean directory structure
+
+When generating documentation, it extracts the module docstring from each code file and uses it as the basis for the documentation. It also includes the full source code and proper cross-references.
+
+## Integration with Mintlify
+
+The documentation management tools are designed to work alongside Mintlify, the documentation platform used for this project. The tools generate and maintain Markdown files that can be rendered by Mintlify.
+
+## Best Practices
+
+When working with the documentation management tools:
+
+1. **Use code references**: Include code references in your documentation to link to source code
+2. **Run checks regularly**: Check for broken links before committing documentation changes
+3. **Generate documentation**: Use the tools to generate initial documentation for new code
+4. **Review generated content**: Always review and enhance automatically generated documentation
+5. **Keep docstrings updated**: Since documentation is generated from docstrings, keep them complete and up-to-date
+
+## Future Enhancements
+
+Planned enhancements for the documentation management tools include:
+
+- Integration with CI/CD pipelines to automate documentation checks
+- Support for extracting class and function-level documentation
+- Generation of API reference documentation
+- Support for non-Python files
+- Visual representation of code relationships 

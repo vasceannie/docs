@@ -55,7 +55,36 @@
             "pages": [
               "sourcing-agent/Development_Guide",
               "sourcing-agent/Testing_Framework",
+              "sourcing-agent/Management_Tools",
               "sourcing-agent/Contributing"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Config",
+            "pages": [
+              "definitions/agent_config___init__",
+              "definitions/agent_config_configuration",
+              "definitions/agent_config_settings"
+            ]
+          },
+          {
+            "group": "Core",
+            "pages": [
+              "definitions/agent_core___init__",
+              "definitions/agent_core_agent",
+              "definitions/agent_core_graph",
+              "definitions/agent_core_state"
+            ]
+          },
+          {
+            "group": "Tools",
+            "pages": [
+              "definitions/agent_tools_base"
             ]
           }
         ]
@@ -80,6 +109,10 @@
       {
         "label": "Documentation",
         "href": "https://github.com/RiseNow-Dev/sourcing-agent/tree/main/documentation/sourcing-agent"
+      },
+      {
+        "label": "API Reference",
+        "href": "https://github.com/RiseNow-Dev/sourcing-agent/tree/main/documentation/definitions"
       }
     ]
   },

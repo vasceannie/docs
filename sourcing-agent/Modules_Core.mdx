@@ -8,28 +8,34 @@ icon: 'cube'
 
 This module provides the core components for building agent-based applications using a graph-based architecture, aligned with LangGraph's patterns.
 
+Try accessing the API Reference directly: [Agent Core API](/api-reference#core)
+
+[code:agent/core/__init__.py]
+[code:agent/core/agent.py]
+[code:agent/core/graph.py]
+[code:agent/core/state.py]
 ## Key Components
 
 ### State Management
 
-- `State`: Base TypedDict class for state representation
-- `StateManager`: Manages state creation, validation, and merging
-- `MessageState`: Specialized state type for message-based interactions
-- Reducer functions: `default_reducer`, `add_to_list` for state updates
+- [`State`](/definitions/agent_core_state#class-state): Base TypedDict class for state representation
+- [`StateManager`](/definitions/agent_core_state#class-statemanager): Manages state creation, validation, and merging
+- [`MessageState`](/definitions/agent_core_state#class-messagestate): Specialized state type for message-based interactions
+- Reducer functions: [`default_reducer`](/definitions/agent_core_state#function-default_reducer), [`add_to_list`](/definitions/agent_core_state#function-add_to_list) for state updates
 
 ### Graph Implementation
 
-- `GraphBuilder`: Builder for creating computation graphs
-- `Graph`: A computational graph for processing state through nodes
-- `START` and `END`: Constants for graph entry and exit points
+- [`GraphBuilder`](/definitions/agent_core_graph#class-graphbuilder): Builder for creating computation graphs
+- [`Graph`](/definitions/agent_core_graph#class-graph): A computational graph for processing state through nodes
+- [`START`](/definitions/agent_core_graph) and [`END`](/definitions/agent_core_graph): Constants for graph entry and exit points
 - Support for conditional edges and node transitions
 
 ### Agent Interfaces
 
-- `AgentInterface`: Protocol defining required methods for agents
-- `BaseAgent`: Abstract base class for agent implementations
-- `RunnableAgent`: Agent implementation that wraps a LangChain Runnable
-- `FunctionAgent`: Agent implementation that wraps a function
+- [`AgentInterface`](/definitions/agent_core_agent#class-agentinterface): Protocol defining required methods for agents
+- [`BaseAgent`](/definitions/agent_core_agent#class-baseagent): Abstract base class for agent implementations
+- [`RunnableAgent`](/definitions/agent_core_agent#class-runnableagent): Agent implementation that wraps a LangChain Runnable
+- [`FunctionAgent`](/definitions/agent_core_agent#class-functionagent): Agent implementation that wraps a function
 
 ## LangGraph Alignment
 

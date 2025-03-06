@@ -8,7 +8,7 @@ icon: 'gear'
 
 ## Overview
 
-The Configuration module (`src/agent/configuration.py`) serves as the central repository for all application settings, environment variables, and operational parameters. It provides a structured way to access and manage configuration across the entire agent system.
+The Configuration module serves as the central repository for all application settings, environment variables, and operational parameters. It provides a structured way to access and manage configuration across the entire agent system.
 
 ## Primary Responsibilities
 
@@ -22,199 +22,256 @@ The Configuration module (`src/agent/configuration.py`) serves as the central re
 
 ### Configuration Class
 
-The primary class for managing all system configuration. This singleton class provides centralized access to settings:
+The primary class for managing all system configuration. This TypedDict class provides centralized access to settings:
+[code:agent/config/__init__.py]
+[code:agent/config/configuration.py]
+[code:agent/config/settings.py]
 
 ```python
-class Configuration:
-    """Manages application configuration and environment settings.
-    
-    This class handles loading and validating all settings from environment 
-    variables with appropriate fallbacks. It provides a single source of truth
-    for application configuration.
+class Configuration(TypedDict, total=False):
+    """Configuration model for the multi-agent workflow.
+
+    This model contains all the configuration settings required for the agent operation.
+    These settings include:
+      - Model configuration: Specifies the language model and optional overrides.
+      - API configuration: Contains keys and base URIs for external services such as OpenAI.
+      - Agent and prompt configuration: Determines the type of agent and the corresponding prompt templates.
+      - Interaction limits: Sets limits on search results, tool calls, and interaction loops.
+      - Service configurations: Details for search services, proxies, databases, and more.
+      - Extraction configuration: Custom schema for data extraction.
+      - Rate limiting configuration: For limiting web and LLM requests.
+
+    Field defaults are drawn from environment variables where applicable, ensuring consistency with runtime settings.
+    Validators ensure the integrity of critical fields such as API keys and URLs.
+
+    Logging Configuration:
+    ---------------------
+    This class provides two methods for logging configuration:
+
+    1. `configure_global_logging()` (static method): Should be called ONCE at application startup,
+       before any Configuration instances are created. This sets up global logging for the entire application.
+
+    2. `configure_logging()` (instance method): Can be called on a specific Configuration instance
+       to apply instance-specific logging settings. This should only be used when you need to change
+       logging configuration for a specific component or workflow.
     """
-    
-    def __init__(self):
-        """Initialize configuration with values from environment."""
-        # Load settings from environment variables
-        self._load_environment_variables()
-        # Validate required settings
-        self._validate_configuration()
+
+    llm_config: ModelConfig
+    api_config: APIConfig
+    database_config: DatabaseConfig
+    proxy_config: ProxyConfig
+    agent_config: AgentConfig
+    rate_limits: RateLimitConfig
+    langgraph_log_level: int
 ```
 
 ### Environment Variable Handling
 
-The module uses a standardized approach to load environment variables with appropriate type conversion and default values:
+The module uses a standardized approach to load environment variables with appropriate type conversion and default values through getter functions:
 
 ```python
-def _load_environment_variables(self):
-    """Load all settings from environment variables with fallbacks.
-    
-    For each setting, this method:
-    1. Attempts to load from the environment
-    2. Applies type conversion (int, float, bool, etc.)
-    3. Falls back to default values when appropriate
-    4. Ensures required values are present
-    """
-    # API settings
-    self.api_base_url = os.getenv("API_BASE_URL", "http://localhost:8000")
-    self.api_timeout = int(os.getenv("API_TIMEOUT", "30"))
-    
-    # LLM settings
-    self.llm_provider = os.getenv("LLM_PROVIDER", "openai")
-    self.llm_model = os.getenv("LLM_MODEL", "gpt-4")
-    
-    # Feature flags
-    self.enable_caching = self._parse_bool(os.getenv("ENABLE_CACHING", "true"))
-    self.debug_mode = self._parse_bool(os.getenv("DEBUG_MODE", "false"))
+def get_openai_api_key() -> str:
+    """Get OpenAI API key from environment variables."""
+    api_key = os.getenv("OPENAI_API_KEY", "")
+    if not api_key:
+        warning_highlight("OpenAI API key not found in environment variables")
+    return api_key
+
+def get_openai_api_base() -> Optional[str]:
+    """Get OpenAI API base URL from environment variables."""
+    api_base = os.getenv("OPENAI_API_BASE_URL")
+    if not api_base:
+        warning_highlight("OpenAI API base URL not found in environment variables")
+    return api_base
 ```
 
 ### Configuration Validation
 
-The module validates that all required settings are present and properly formatted:
+The module validates that all required settings are present and properly formatted through validation functions:
 
 ```python
-def _validate_configuration(self):
-    """Ensure all required configuration values are present and valid.
+def validate_api_config(api_config: APIConfig) -> None:
+    """Validate API configuration.
     
-    Raises:
-        ConfigurationError: If any required setting is missing or invalid
-    """
-    # Check for required API keys
-    if not self.openai_api_key and self.llm_provider == "openai":
-        raise ConfigurationError("OpenAI API key is required when using OpenAI as provider")
+    Args:
+        api_config: API configuration to validate
         
-    # Validate numeric parameters are in acceptable ranges
-    if self.api_timeout < 1 or self.api_timeout > 300:
-        raise ConfigurationError("API_TIMEOUT must be between 1 and 300 seconds")
+    Raises:
+        ConfigurationException: If required API configuration is missing or invalid
+    """
+    if not api_config.get("openai_api_key") and not api_config.get("anthropic_api_key"):
+        raise ConfigurationException(
+            "Either OpenAI or Anthropic API key is required"
+        )
 ```
 
 ### Utility Methods
 
-Helper methods for configuration processing:
+Helper methods for configuration processing include proxy setup and request handling:
 
 ```python
-def _parse_bool(self, value: str) -> bool:
-    """Parse string value to boolean.
+def create_proxied_session(
+    proxy_config: ProxyConfig,
+    retries: int = 3,
+    backoff_factor: float = 0.3,
+    status_forcelist: tuple[int, ...] = (500, 502, 503, 504),
+    pool_maxsize: int = 10,
+    pool_connections: int = 10,
+    timeout: Union[float, tuple[float, float]] = (3.05, 30),
+    verify_ssl: bool = True
+) -> requests.Session:
+    """Create a requests session with proxy configuration.
+    
+    This session is configured with:
+    - Proxy settings
+    - Retry mechanism
+    - Connection pooling
+    - Timeouts
     
     Args:
-        value: String value to parse ('true', 'yes', 'on', '1' are True)
+        proxy_config: Proxy configuration
+        retries: Number of retries for failed requests
+        backoff_factor: Backoff factor for retries
+        status_forcelist: HTTP status codes that trigger retries
+        pool_maxsize: Maximum number of connections in the pool
+        pool_connections: Number of connection objects to keep in pool
+        timeout: Request timeout in seconds (connect_timeout, read_timeout)
+        verify_ssl: Whether to verify SSL certificates
         
     Returns:
-        bool: The parsed boolean value
+        Configured requests.Session
     """
-    return value.lower() in ("yes", "true", "t", "1", "on")
-    
-def get_api_headers(self) -> Dict[str, str]:
-    """Get prepared API headers with authorization.
-    
-    Returns:
-        Dict[str, str]: Headers dictionary ready for API requests
-    """
-    return {
-        "Authorization": f"Bearer {self.api_key}",
-        "Content-Type": "application/json",
-        "User-Agent": f"AgentApp/{self.version}"
-    }
+    # Implementation details...
 ```
 
 ## Configuration Properties
 
-The Configuration class provides numerous properties that are used throughout the agent system:
+The Configuration class provides numerous properties organized by type:
 
-### General Settings
+### Model Configuration
 
-| Property | Description | Default | Type |
-|----------|-------------|---------|------|
-| `env` | Environment name (dev, test, prod) | "dev" | string |
-| `debug_mode` | Enable extended debugging | False | boolean |
-| `version` | Application version | "0.1.0" | string |
+```python
+class ModelConfig(TypedDict, total=True):
+    """Model configuration parameters."""
 
-### API Settings
+    model_name: NotRequired[Optional[str]]
+    temperature: NotRequired[Optional[float]]
+```
 
-| Property | Description | Default | Type |
-|----------|-------------|---------|------|
-| `api_base_url` | Base URL for API calls | "http://localhost:8000" | string |
-| `api_timeout` | Timeout for API calls in seconds | 30 | integer |
-| `api_retries` | Number of automatic retries | 3 | integer |
+### API Configuration
 
-### LLM Settings
+```python
+class APIConfig(TypedDict, total=True):
+    """API configuration parameters."""
 
-| Property | Description | Default | Type |
-|----------|-------------|---------|------|
-| `llm_provider` | LLM provider (openai, anthropic, etc.) | "openai" | string |
-| `llm_model` | Model name to use | "gpt-4" | string |
-| `llm_temperature` | Temperature for LLM calls | 0.7 | float |
-| `llm_timeout` | Timeout for LLM calls in seconds | 60 | integer |
+    openai_api_key: NotRequired[Optional[str]]
+    anthropic_api_key: NotRequired[Optional[str]]
+    fireworks_api_key: NotRequired[Optional[str]]
+    openai_api_base: NotRequired[Optional[str]]
+    brave_api_key: NotRequired[Optional[str]]
+    brave_search_endpoint: NotRequired[Optional[str]]
+    brave_web_endpoint: NotRequired[Optional[str]]
+    brave_summarizer_endpoint: NotRequired[Optional[str]]
+    brave_news_endpoint: NotRequired[Optional[str]]
+    searxng_url: NotRequired[Optional[str]]
+    jina_api_key: NotRequired[Optional[str]]
+    langsmith_api_key: NotRequired[Optional[str]]
+    langsmith_project: NotRequired[Optional[str]]
+    langsmith_endpoint: NotRequired[Optional[str]]
+```
 
-### Storage Settings
+### Database Configuration
 
-| Property | Description | Default | Type |
-|----------|-------------|---------|------|
-| `storage_type` | Storage backend (local, s3, etc.) | "local" | string |
-| `storage_path` | Path for local storage | "./storage" | string |
-| `enable_caching` | Enable result caching | True | boolean |
-| `cache_ttl` | Cache time-to-live in seconds | 3600 | integer |
+```python
+class DatabaseConfig(TypedDict, total=True):
+    """Database configuration parameters."""
+
+    qdrant_host: NotRequired[Optional[str]]
+    qdrant_port: NotRequired[Optional[int]]
+    qdrant_collection_name: NotRequired[Optional[str]]
+    postgres_user: NotRequired[Optional[str]]
+    postgres_password: NotRequired[Optional[str]]
+    postgres_db: NotRequired[Optional[str]]
+    postgres_host: NotRequired[Optional[str]]
+    postgres_port: NotRequired[Optional[int]]
+```
+
+### Agent Configuration
+
+```python
+class AgentConfig(TypedDict, total=True):
+    """Agent configuration parameters."""
+
+    agent_type: NotRequired[Optional[AgentType]]
+    max_loops: NotRequired[Optional[int]]
+    max_search_results: NotRequired[Optional[int]]
+    max_info_tool_calls: NotRequired[Optional[int]]
+    max_research_iterations: NotRequired[Optional[int]]
+    max_validation_attempts: NotRequired[Optional[int]]
+    prompt_templates: NotRequired[Optional[Dict[AgentType, str]]]
+    extraction_schema: NotRequired[Optional[Dict[str, Any]]]
+    validation_thresholds: NotRequired[Optional[Dict[str, float]]]
+    market_data_sources: NotRequired[Optional[List[str]]]
+```
 
 ## Usage Examples
 
 ### Basic Configuration Loading
 
 ```python
-from agent.configuration import Configuration
+from agent.config import from_env
 
-# Load configuration
-config = Configuration()
+# Load configuration from environment variables
+config = from_env()
 
 # Use configuration values
-timeout = config.api_timeout
-base_url = config.api_base_url
+model_name = config["llm_config"]["model_name"]
+api_key = config["api_config"]["openai_api_key"]
 ```
 
-### Conditional Logic Based on Configuration
+### Creating Custom Configuration
 
 ```python
-from agent.configuration import Configuration
+from agent.config import create_default_configuration
 
-config = Configuration()
+# Create default configuration
+config = create_default_configuration()
 
-# Use feature flags to control behavior
-if config.enable_caching:
-    result = cache.get(key) or fetch_from_api()
-    cache.set(key, result, ttl=config.cache_ttl)
-else:
-    result = fetch_from_api()
-    
-# Handle environment-specific logic
-if config.env == "dev":
-    # Use development-specific behavior
-    logger.setLevel(logging.DEBUG)
-else:
-    # Use production behavior
-    logger.setLevel(logging.WARNING)
+# Override specific settings
+config["llm_config"]["model_name"] = "gpt-4-turbo"
+config["agent_config"]["max_loops"] = 10
+
+# Apply configuration
+setup_proxy(config)
+configure_logging(config)
 ```
 
-### API Request Configuration
+### Integration with LangChain
 
 ```python
-import aiohttp
-from agent.configuration import Configuration
+from agent.config import from_runnable_config
+from langchain_core.runnables import RunnableConfig
 
-config = Configuration()
+# Create LangChain runnable config
+lc_config: RunnableConfig = {
+    "metadata": {
+        "model_name": "gpt-4",
+        "temperature": 0.2,
+        "agent_type": "researching_agent"
+    },
+    "tags": ["research", "production"]
+}
 
-async def make_api_request(endpoint, data):
-    """Make API request with configured settings."""
-    url = f"{config.api_base_url}/{endpoint}"
-    headers = config.get_api_headers()
-    
-    async with aiohttp.ClientSession() as session:
-        timeout = aiohttp.ClientTimeout(total=config.api_timeout)
-        async with session.post(url, json=data, headers=headers, timeout=timeout) as response:
-            return await response.json()
+# Convert to agent configuration
+config = from_runnable_config(lc_config)
+
+# Use in LangChain components
+# ...
 ```
 
 ## Best Practices
 
-1. **Single Source of Truth**: Always use the Configuration class for settings, never hardcode values
+1. **Single Source of Truth**: Always use the Configuration model for settings, never hardcode values
 2. **Environment Variables**: Use environment variables for deployment-specific settings
 3. **Validation**: Validate configuration values early to fail fast
 4. **Default Values**: Provide sensible defaults for optional settings
