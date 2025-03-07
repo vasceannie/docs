@@ -14,40 +14,39 @@ icon: 'cube'
 import uuid
 from typing import Any, Callable, Dict, Optional, Set, Type
 from .state import State, StateManager
-
 ```
 
 ## Description
-Computational graph system for agent workflow orchestration.
+`Computational` graph system for agent workflow orchestration.
 
-Implements directed graph structures with:
-- Node-based processing
-- Conditional edges
-- State propagation
-- Sync/async execution
-- Cycle detection
-- Validation
+`Implements` directed graph structures with:
+- `Node`-based processing
+- `Conditional` edges
+- `State` propagation
+- `Sync`/async execution
+- `Cycle` detection
+- `Validation`
 
-Follows LangGraph design patterns with enhanced type safety and state management.
+`Follows` `LangGraph` design patterns with enhanced type safety and state management.
 
 ## Class: GraphBuilder
 
-Builder for constructing computational graphs.
+`Builder` for constructing computational graphs.
 
-Implements fluent interface for defining:
-- Processing nodes
-- Transition logic
-- Entry/exit points
-- State typing
+`Implements` fluent interface for defining:
+- `Processing` nodes
+- `Transition` logic
+- `Entry`/exit points
+- `State` typing
 
 **Attributes:**
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `state_type` | Type[State] | Primary state class for graph operations |
-| `nodes` | dict[str, Callable] | Node processors by name |
-| `normal_edges` | dict[str, set[str]] | Unconditional transitions |
-| `conditional_edges` | dict[str, dict[Callable, str]] | Conditional transitions |
+| `state_type` | ``Type`[`State`]` | `Primary` state class for graph operations |
+| `nodes` | `dict[str, `Callable`]` | `Node` processors by name |
+| `normal_edges` | `dict[str, set[str]]` | `Unconditional` transitions |
+| `conditional_edges` | `dict[str, dict[`Callable`, str]]` | `Conditional` transitions |
 
 
 ### Class Definition
@@ -64,16 +63,21 @@ def add_node(self, name, processor) -> 'GraphBuilder'
 
 `Add` a node to the graph.
 
+
 **Args:**
 
     `name`: The name of the node.
     `processor`: The function that processes state at this node.
 
 
+**Returns:**
+
+    The builder instance for chaining.
+
 **Parameters:**
 
-- `name` (str)
-- `processor` (Callable)
+- `name` (`str`)
+- `processor` (`Callable`)
 
 #### Method: add_edge
 
@@ -83,16 +87,21 @@ def add_edge(self, source, target) -> 'GraphBuilder'
 
 `Add` a normal edge between two nodes.
 
+
 **Args:**
 
     `source`: The source node name.
     `target`: The target node name.
 
 
+**Returns:**
+
+    The builder instance for chaining.
+
 **Parameters:**
 
-- `source` (str)
-- `target` (str)
+- `source` (`str`)
+- `target` (`str`)
 
 #### Method: add_conditional_edge
 
@@ -101,6 +110,7 @@ def add_conditional_edge(self, source, condition, target) -> 'GraphBuilder'
 ```
 
 `Register` conditional state transition between nodes.
+
 
 **Args:**
 
@@ -114,11 +124,15 @@ def add_conditional_edge(self, source, condition, target) -> 'GraphBuilder'
     self for fluent chaining
 
 
+**Raises:**
+
+    `ValueError`: For invalid node references
+
 **Parameters:**
 
-- `source` (str)
-- `condition` (Callable)
-- `target` (str)
+- `source` (`str`)
+- `condition` (`Callable`)
+- `target` (`str`)
 
 #### Method: set_entry_point
 
@@ -128,14 +142,19 @@ def set_entry_point(self, node_name) -> 'GraphBuilder'
 
 `Set` the entry point for the graph.
 
+
 **Args:**
 
     `node_name`: The name of the entry node.
 
 
+**Returns:**
+
+    The builder instance for chaining.
+
 **Parameters:**
 
-- `node_name` (str)
+- `node_name` (`str`)
 
 #### Method: set_finish_point
 
@@ -145,14 +164,19 @@ def set_finish_point(self, node_name) -> 'GraphBuilder'
 
 `Set` the finish point for the graph.
 
+
 **Args:**
 
     `node_name`: The name of the finish node.
 
 
+**Returns:**
+
+    The builder instance for chaining.
+
 **Parameters:**
 
-- `node_name` (str)
+- `node_name` (`str`)
 
 #### Method: build
 
@@ -162,6 +186,11 @@ def build(self) -> 'Graph'
 
 `Build` and return the graph.
 
+
+**Returns:**
+
+    The constructed graph.
+
 #### Method: compile
 
 ```python
@@ -170,11 +199,18 @@ def compile(self) -> 'Graph'
 
 `Compile` and return the graph (alias for build).
 
+
+**Returns:**
+
+    The constructed graph.
+
 #### Method: _validate_graph
 
 ```python
 def _validate_graph(self) -> None
 ```
+
+`Validate` the graph structure to ensure it's properly formed.
 
 **Returns:**
 
@@ -182,21 +218,21 @@ def _validate_graph(self) -> None
 
 ## Class: Graph
 
-Executable computational graph for state processing.
+`Executable` computational graph for state processing.
 
-Manages:
-- State propagation through nodes
-- Transition logic execution
-- Error handling
-- Checkpointing
-- Execution mode (sync/async)
+`Manages`:
+- `State` propagation through nodes
+- `Transition` logic execution
+- `Error` handling
+- `Checkpointing`
+- `Execution` mode (sync/async)
 
 **Attributes:**
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `state_manager` | StateManager | Handles state validation/merging |
-| `graph_id` | str | UUID identifier for graph instance |
+| `state_manager` | ``StateManager`` | `Handles` state validation/merging |
+| `graph_id` | `str` | `UUID` identifier for graph instance |
 
 
 ### Class Definition
@@ -211,6 +247,8 @@ class Graph():
 def _validate_graph(self) -> None
 ```
 
+`Validate` the graph structure to ensure it's properly formed.
+
 **Returns:**
 
 - None
@@ -222,6 +260,7 @@ def process(self, state, config) -> Dict[str, Any]
 ```
 
 `Execute` graph processing synchronously.
+
 
 **Args:**
 
@@ -237,10 +276,14 @@ def process(self, state, config) -> Dict[str, Any]
     `Final` state after graph execution
 
 
+**Raises:**
+
+    `GraphExecutionError`: For unrecoverable processing failures
+
 **Parameters:**
 
-- `state` (Optional[Dict[str, Any]])
-- `config` (Optional[Dict[str, Any]])
+- `state` (`Optional[Dict[str, Any]]`)
+- `config` (`Optional[Dict[str, Any]]`)
 
 #### Method: _get_next_node
 
@@ -250,16 +293,21 @@ def _get_next_node(self, current_node, state) -> Optional[str]
 
 `Determine` the next node based on edges and conditions.
 
+
 **Args:**
 
     `current_node`: The current node name.
     `state`: The current state.
 
 
+**Returns:**
+
+    The name of the next node, or `None` if there are no outgoing edges.
+
 **Parameters:**
 
-- `current_node` (str)
-- `state` (Dict[str, Any])
+- `current_node` (`str`)
+- `state` (`Dict[str, Any]`)
 
 #### Method: get_state
 
@@ -269,14 +317,19 @@ def get_state(self, config) -> Dict[str, Any]
 
 `Get` the current state of the graph.
 
+
 **Args:**
 
     `config`: Optional configuration.
 
 
+**Returns:**
+
+    The current state.
+
 **Parameters:**
 
-- `config` (Optional[Dict[str, Any]])
+- `config` (`Optional[Dict[str, Any]]`)
 
 #### Method: update_state
 
@@ -286,16 +339,21 @@ def update_state(self, config, updates) -> Dict[str, Any]
 
 `Update` the current state of the graph.
 
+
 **Args:**
 
     `config`: Optional configuration.
     `updates`: The updates to apply to the state.
 
 
+**Returns:**
+
+    The updated state.
+
 **Parameters:**
 
-- `config` (Optional[Dict[str, Any]])
-- `updates` (Optional[Dict[str, Any]])
+- `config` (`Optional[Dict[str, Any]]`)
+- `updates` (`Optional[Dict[str, Any]]`)
 
 #### Method: invoke
 
@@ -305,13 +363,18 @@ def invoke(self, state, config) -> Dict[str, Any]
 
 `Invoke` the graph with the given state (alias for process).
 
+
 **Args:**
 
     `state`: Optional initial state dictionary.
     `config`: Optional configuration for processing.
 
 
+**Returns:**
+
+    The final state after processing.
+
 **Parameters:**
 
-- `state` (Optional[Dict[str, Any]])
-- `config` (Optional[Dict[str, Any]])
+- `state` (`Optional[Dict[str, Any]]`)
+- `config` (`Optional[Dict[str, Any]]`)

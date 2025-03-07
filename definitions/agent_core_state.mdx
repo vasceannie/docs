@@ -17,24 +17,23 @@ import uuid
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, Generic, List, Optional, Type, TypeVar, get_type_hints
 from typing_extensions import Annotated, TypedDict
-
 ```
 
 ## Description
-State management system for agent workflows.
+`State` management system for agent workflows.
 
-Implements TypedDict-based state containers with:
-- Validation
-- Merging strategies
-- Versioning
-- Reducer functions for state transitions
-- Deep copying and comparison utilities
+`Implements` `TypedDict`-based state containers with:
+- `Validation`
+- `Merging` strategies
+- `Versioning`
+- `Reducer` functions for state transitions
+- `Deep` copying and comparison utilities
 
-Follows LangGraph state management patterns with enhanced type safety.
+`Follows` `LangGraph` state management patterns with enhanced type safety.
 
 ## Class: State
 
-Base state model for all graph operations.
+`Base` state model for all graph operations.
 
 ### Class Definition
 ```python
@@ -47,25 +46,25 @@ class State(TypedDict, total=False):
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `id` | str |  |
-| `metadata` | Dict[str, Any] |  |
+| `id` | `str` |  |
+| `metadata` | `Dict[str, Any]` |  |
 
 ## Class: StateManager
 
-Orchestrates state lifecycle operations for agent systems.
+`Orchestrates` state lifecycle operations for agent systems.
 
-Features:
-- State creation/validation
-- Reducer function management
-- Type-safe state merging
-- Annotation-based configuration
+`Features`:
+- `State` creation/validation
+- `Reducer` function management
+- `Type`-safe state merging
+- `Annotation`-based configuration
 
 **Attributes:**
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `state_cls` | Type[T] | TypedDict class defining state structure |
-| `reducers` | dict[str, Callable] | Field-specific merge strategies |
+| `state_cls` | ``Type`[T]` | `TypedDict` class defining state structure |
+| `reducers` | `dict[str, `Callable`]` | `Field`-specific merge strategies |
 
 
 ### Class Definition
@@ -83,6 +82,8 @@ def _extract_reducers(self) -> None
 `Parse` type annotations to configure state merge strategies.
 
 `Processes` `Annotated`[T, reducer] declarations to build reducer mapping.
+`Falls` back to default replacement strategy when no reducer specified.
+
 **Returns:**
 
 - None
@@ -95,14 +96,19 @@ def create_state(self, data) -> Dict[str, Any]
 
 `Create` a new state instance.
 
+
 **Args:**
 
     `data`: Initial state data.
 
 
+**Returns:**
+
+    A new state dictionary.
+
 **Parameters:**
 
-- `data` (Optional[Dict[str, Any]])
+- `data` (`Optional[Dict[str, Any]]`)
 
 #### Method: validate_state
 
@@ -112,14 +118,19 @@ def validate_state(self, state) -> Dict[str, Any]
 
 `Validate` a state dictionary.
 
+
 **Args:**
 
     `state`: The state to validate.
 
 
+**Returns:**
+
+    The validated state dictionary.
+
 **Parameters:**
 
-- `state` (Dict[str, Any])
+- `state` (`Dict[str, Any]`)
 
 #### Method: merge_states
 
@@ -129,29 +140,34 @@ def merge_states(self, base_state, updates) -> Dict[str, Any]
 
 `Merge` updates into the base state using reducers.
 
+
 **Args:**
 
     `base_state`: The base state to update.
     `updates`: The updates to apply.
 
 
+**Returns:**
+
+    The merged state.
+
 **Parameters:**
 
-- `base_state` (Dict[str, Any])
-- `updates` (Dict[str, Any])
+- `base_state` (`Dict[str, Any]`)
+- `updates` (`Dict[str, Any]`)
 
 ## Class: MessageState
 
-Specialized state for conversation-driven agents.
+`Specialized` state for conversation-driven agents.
 
-Extends base State with message history management using list appending
+`Extends` base `State` with message history management using list appending
 reducer strategy.
 
 **Attributes:**
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `messages` | Annotated[List[dict[str, Any]], add_to_list] | Ordered conversation history with automated list merging |
+| `messages` | ``Annotated`[`List`[dict[str, `Any`]], add_to_list]` | `Ordered` conversation history with automated list merging |
 
 
 ### Class Definition
@@ -166,9 +182,9 @@ class MessageState(TypedDict, total=False):
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `messages` | Annotated[List[Dict[str, Any]], add_to_list] |  |
-| `id` | str |  |
-| `meta` | Dict[str, Any] |  |
+| `messages` | `Annotated[List[Dict[str, Any]], add_to_list]` |  |
+| `id` | `str` |  |
+| `meta` | `Dict[str, Any]` |  |
 
 ## Function: default_reducer
 
@@ -176,12 +192,12 @@ class MessageState(TypedDict, total=False):
 def default_reducer(existing, new) -> Any
 ```
 
-Replace the existing value with the new value.
+`Replace` the existing value with the new value.
 
 **Parameters:**
 
-- `existing` (Any)
-- `new` (Any)
+- `existing` (`Any`)
+- `new` (`Any`)
 
 **Returns:**
 
@@ -193,12 +209,12 @@ Replace the existing value with the new value.
 def add_to_list(existing, new) -> List[Any]
 ```
 
-Reducer that adds new items to a list.
+`Reducer` that adds new items to a list.
 
 **Parameters:**
 
-- `existing` (Optional[List[Any]])
-- `new` (Any)
+- `existing` (`Optional[List[Any]]`)
+- `new` (`Any`)
 
 **Returns:**
 
@@ -210,7 +226,8 @@ Reducer that adds new items to a list.
 def create_state(data) -> Dict[str, Any]
 ```
 
-Create a new state instance.
+`Create` a new state instance.
+
 
 **Args:**
 
@@ -223,7 +240,7 @@ Create a new state instance.
 
 **Parameters:**
 
-- `data` (Optional[Dict[str, Any]])
+- `data` (`Optional[Dict[str, Any]]`)
 
 **Returns:**
 
@@ -235,7 +252,8 @@ Create a new state instance.
 def validate_state(state) -> Dict[str, Any]
 ```
 
-Validate a state dictionary.
+`Validate` a state dictionary.
+
 
 **Args:**
 
@@ -248,7 +266,7 @@ Validate a state dictionary.
 
 **Parameters:**
 
-- `state` (Dict[str, Any])
+- `state` (`Dict[str, Any]`)
 
 **Returns:**
 
@@ -260,7 +278,8 @@ Validate a state dictionary.
 def merge_states(base_state, updates, reducers) -> Dict[str, Any]
 ```
 
-Merge two state dictionaries using configured reducers.
+`Merge` two state dictionaries using configured reducers.
+
 
 **Args:**
 
@@ -288,9 +307,9 @@ Merge two state dictionaries using configured reducers.
 
 **Parameters:**
 
-- `base_state` (Dict[str, Any])
-- `updates` (Dict[str, Any])
-- `reducers` (Optional[Dict[str, ReducerType]])
+- `base_state` (`Dict[str, Any]`)
+- `updates` (`Dict[str, Any]`)
+- `reducers` (`Optional[Dict[str, ReducerType]]`)
 
 **Returns:**
 
@@ -302,7 +321,8 @@ Merge two state dictionaries using configured reducers.
 def deep_copy_state(state) -> Dict[str, Any]
 ```
 
-Create a deep copy of a state dictionary.
+`Create` a deep copy of a state dictionary.
+
 
 **Args:**
 
@@ -315,7 +335,7 @@ Create a deep copy of a state dictionary.
 
 **Parameters:**
 
-- `state` (Dict[str, Any])
+- `state` (`Dict[str, Any]`)
 
 **Returns:**
 
@@ -327,7 +347,8 @@ Create a deep copy of a state dictionary.
 def compare_states(state1, state2) -> Dict[str, Any]
 ```
 
-Compare two state dictionaries and identify differences.
+`Compare` two state dictionaries and identify differences.
+
 
 **Args:**
 
@@ -341,8 +362,8 @@ Compare two state dictionaries and identify differences.
 
 **Parameters:**
 
-- `state1` (Dict[str, Any])
-- `state2` (Dict[str, Any])
+- `state1` (`Dict[str, Any]`)
+- `state2` (`Dict[str, Any]`)
 
 **Returns:**
 
@@ -354,7 +375,8 @@ Compare two state dictionaries and identify differences.
 def log_state(state) -> None
 ```
 
-Log the current state in a readable format.
+`Log` the current state in a readable format.
+
 
 **Args:**
 
@@ -362,7 +384,7 @@ Log the current state in a readable format.
 
 **Parameters:**
 
-- `state` (Dict[str, Any])
+- `state` (`Dict[str, Any]`)
 
 **Returns:**
 

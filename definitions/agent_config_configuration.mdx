@@ -24,32 +24,31 @@ from agent.config.settings import get_anthropic_api_key, get_brave_api_key, get_
 from agent.constants import DEFAULT_LLM_MAX_REQUESTS, DEFAULT_LLM_TIME_WINDOW, DEFAULT_LLM_TIMEOUT, DEFAULT_MAX_CONCURRENT_CONNECTIONS, DEFAULT_MAX_CONNECTIONS_PER_HOST, DEFAULT_MAX_CONTENT_CHARS, DEFAULT_MAX_INFO_TOOL_CALLS, DEFAULT_MAX_LOOPS, DEFAULT_MAX_NEWS_RESULTS, DEFAULT_MAX_RESEARCH_ITERATIONS, DEFAULT_MAX_SEARCH_RESULTS, DEFAULT_MAX_SUMMARIZER_RESULTS, DEFAULT_MAX_VALIDATION_ATTEMPTS, DEFAULT_MODEL_NAME, DEFAULT_TEMPERATURE, DEFAULT_TOOL_TIMEOUT, DEFAULT_WEB_MAX_REQUESTS, DEFAULT_WEB_TIME_WINDOW, AgentType
 from agent.exceptions import ConfigurationException
 from agent.utils.logging import error_highlight, info_highlight, info_success, warning_highlight
-
 ```
 
 ## Description
-Configuration models.
+`Configuration` models.
 
 This module provides functionality for configuration models
 in the agent framework.
 
 ## Class: RunnableMetadata
 
-Metadata structure for LangChain runnable configurations.
+`Metadata` structure for `LangChain` runnable configurations.
 
 **Attributes:**
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `model` | str, optional | Name of the language model to use. |
-| `temperature` | float, optional | Sampling temperature for model generation. |
-| `model_name_or_path` | str, optional | Model name or path for local models. |
-| `openai_api_base` | str, optional | Base URL for OpenAI-compatible API. |
-| `openai_api_key` | str, optional | API key for OpenAI services. |
-| `agent_type` | str, optional | Type of agent using this configuration. |
-| `max_loops` | int, optional | Maximum iteration loops for agent operations. |
-| `extraction_schema` | dict, optional | Schema for data extraction patterns. |
-| `prompt_templates` | dict, optional | Template strings for different prompts. |
+| `model` | `str, optional` | `Name` of the language model to use. |
+| `temperature` | `float, optional` | `Sampling` temperature for model generation. |
+| `model_name_or_path` | `str, optional` | `Model` name or path for local models. |
+| `openai_api_base` | `str, optional` | `Base` `URL` for `OpenAI`-compatible `API`. |
+| `openai_api_key` | `str, optional` | `API` key for `OpenAI` services. |
+| `agent_type` | `str, optional` | `Type` of agent using this configuration. |
+| `max_loops` | `int, optional` | `Maximum` iteration loops for agent operations. |
+| `extraction_schema` | `dict, optional` | `Schema` for data extraction patterns. |
+| `prompt_templates` | `dict, optional` | `Template` strings for different prompts. |
 
 
 ### Class Definition
@@ -70,28 +69,28 @@ class RunnableMetadata(TypedDict, total=True):
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `model` | NotRequired[str] | Name of the language model to use. |
-| `temperature` | NotRequired[float] | Sampling temperature for model generation. |
-| `model_name_or_path` | NotRequired[Optional[str]] | Model name or path for local models. |
-| `openai_api_base` | NotRequired[str] | Base URL for OpenAI-compatible API. |
-| `openai_api_key` | NotRequired[str] | API key for OpenAI services. |
-| `agent_type` | NotRequired[str] | Type of agent using this configuration. |
-| `max_loops` | NotRequired[int] | Maximum iteration loops for agent operations. |
-| `extraction_schema` | NotRequired[Dict[str, str]] | Schema for data extraction patterns. |
-| `prompt_templates` | NotRequired[Dict[str, str]] | Template strings for different prompts. |
+| `model` | `NotRequired[str]` | Name of the language model to use. |
+| `temperature` | `NotRequired[float]` | Sampling temperature for model generation. |
+| `model_name_or_path` | `NotRequired[Optional[str]]` | Model name or path for local models. |
+| `openai_api_base` | `NotRequired[str]` | Base URL for OpenAI-compatible API. |
+| `openai_api_key` | `NotRequired[str]` | API key for OpenAI services. |
+| `agent_type` | `NotRequired[str]` | Type of agent using this configuration. |
+| `max_loops` | `NotRequired[int]` | Maximum iteration loops for agent operations. |
+| `extraction_schema` | `NotRequired[Dict[str, str]]` | Schema for data extraction patterns. |
+| `prompt_templates` | `NotRequired[Dict[str, str]]` | Template strings for different prompts. |
 
 ## Class: RunnableConfigDict
 
-Configuration structure for LangChain runnables.
+`Configuration` structure for `LangChain` runnables.
 
 **Attributes:**
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `callbacks` | list[BaseCallbackHandler] | BaseCallbackManager, optional | Callback handlers for the runnable. |
-| `tags` | list[str] | Tags for categorizing the runnable. |
-| `metadata` | dict[str, Any] | Additional metadata dictionary. |
-| `run_name` | str | Identifier for the runnable execution. |
+| `callbacks` | `list[`BaseCallbackHandler`] | `BaseCallbackManager`, optional` | `Callback` handlers for the runnable. |
+| `tags` | `list[str]` | `Tags` for categorizing the runnable. |
+| `metadata` | `dict[str, `Any`]` | `Additional` metadata dictionary. |
+| `run_name` | `str` | `Identifier` for the runnable execution. |
 
 
 ### Class Definition
@@ -107,31 +106,31 @@ class RunnableConfigDict(TypedDict, total=False):
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `callbacks` | NotRequired[Optional[Union[List[BaseCallbackHandler], BaseCallbackManager]]] |  |
-| `tags` | List[str] | Tags for categorizing the runnable. |
-| `metadata` | Dict[str, Any] | Additional metadata dictionary. |
-| `run_name` | str | Identifier for the runnable execution. |
+| `callbacks` | `NotRequired[Optional[Union[List[BaseCallbackHandler], BaseCallbackManager]]]` |  |
+| `tags` | `List[str]` | Tags for categorizing the runnable. |
+| `metadata` | `Dict[str, Any]` | Additional metadata dictionary. |
+| `run_name` | `str` | Identifier for the runnable execution. |
 
 ## Class: RateLimitConfig
 
-Rate limiting configuration parameters.
+`Rate` limiting configuration parameters.
 
 **Attributes:**
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `web_max_requests` | int, optional | Maximum web requests per time window. |
-| `web_time_window` | float, optional | Time window (seconds) for web requests. |
-| `llm_max_requests` | int, optional | Maximum LLM requests per time window. |
-| `llm_time_window` | float, optional | Time window (seconds) for LLM requests. |
-| `max_concurrent_connections` | int, optional | Max simultaneous connections. |
-| `max_connections_per_host` | int, optional | Max connections to single host. |
-| `max_search_results` | int, optional | Maximum results per search operation. |
-| `max_summarizer_results` | int, optional | Max results for summarization. |
-| `max_news_results` | int, optional | Maximum news articles to process. |
-| `max_content_chars` | int, optional | Character limit for content processing. |
-| `llm_timeout` | int, optional | Timeout (seconds) for LLM operations. |
-| `tool_timeout` | int, optional | Timeout (seconds) for tool operations. |
+| `web_max_requests` | `int, optional` | `Maximum` web requests per time window. |
+| `web_time_window` | `float, optional` | `Time` window (seconds) for web requests. |
+| `llm_max_requests` | `int, optional` | `Maximum` `LLM` requests per time window. |
+| `llm_time_window` | `float, optional` | `Time` window (seconds) for `LLM` requests. |
+| `max_concurrent_connections` | `int, optional` | `Max` simultaneous connections. |
+| `max_connections_per_host` | `int, optional` | `Max` connections to single host. |
+| `max_search_results` | `int, optional` | `Maximum` results per search operation. |
+| `max_summarizer_results` | `int, optional` | `Max` results for summarization. |
+| `max_news_results` | `int, optional` | `Maximum` news articles to process. |
+| `max_content_chars` | `int, optional` | `Character` limit for content processing. |
+| `llm_timeout` | `int, optional` | `Timeout` (seconds) for `LLM` operations. |
+| `tool_timeout` | `int, optional` | `Timeout` (seconds) for tool operations. |
 
 
 ### Class Definition
@@ -155,22 +154,22 @@ class RateLimitConfig(TypedDict, total=True):
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `web_max_requests` | NotRequired[int] | Maximum web requests per time window. |
-| `web_time_window` | NotRequired[float] | Time window (seconds) for web requests. |
-| `llm_max_requests` | NotRequired[int] | Maximum LLM requests per time window. |
-| `llm_time_window` | NotRequired[float] | Time window (seconds) for LLM requests. |
-| `max_concurrent_connections` | NotRequired[int] | Max simultaneous connections. |
-| `max_connections_per_host` | NotRequired[int] | Max connections to single host. |
-| `max_search_results` | NotRequired[int] | Maximum results per search operation. |
-| `max_summarizer_results` | NotRequired[int] | Max results for summarization. |
-| `max_news_results` | NotRequired[int] | Maximum news articles to process. |
-| `max_content_chars` | NotRequired[int] | Character limit for content processing. |
-| `llm_timeout` | NotRequired[int] | Timeout (seconds) for LLM operations. |
-| `tool_timeout` | NotRequired[int] | Timeout (seconds) for tool operations. |
+| `web_max_requests` | `NotRequired[int]` | Maximum web requests per time window. |
+| `web_time_window` | `NotRequired[float]` | Time window (seconds) for web requests. |
+| `llm_max_requests` | `NotRequired[int]` | Maximum LLM requests per time window. |
+| `llm_time_window` | `NotRequired[float]` | Time window (seconds) for LLM requests. |
+| `max_concurrent_connections` | `NotRequired[int]` | Max simultaneous connections. |
+| `max_connections_per_host` | `NotRequired[int]` | Max connections to single host. |
+| `max_search_results` | `NotRequired[int]` | Maximum results per search operation. |
+| `max_summarizer_results` | `NotRequired[int]` | Max results for summarization. |
+| `max_news_results` | `NotRequired[int]` | Maximum news articles to process. |
+| `max_content_chars` | `NotRequired[int]` | Character limit for content processing. |
+| `llm_timeout` | `NotRequired[int]` | Timeout (seconds) for LLM operations. |
+| `tool_timeout` | `NotRequired[int]` | Timeout (seconds) for tool operations. |
 
 ## Class: ModelConfig
 
-Model configuration parameters.
+`Model` configuration parameters.
 
 ### Class Definition
 ```python
@@ -183,12 +182,12 @@ class ModelConfig(TypedDict, total=True):
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `model_name` | NotRequired[Optional[str]] |  |
-| `temperature` | NotRequired[Optional[float]] |  |
+| `model_name` | `NotRequired[Optional[str]]` |  |
+| `temperature` | `NotRequired[Optional[float]]` |  |
 
 ## Class: APIConfig
 
-API configuration parameters.
+`API` configuration parameters.
 
 ### Class Definition
 ```python
@@ -213,24 +212,24 @@ class APIConfig(TypedDict, total=True):
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `openai_api_key` | NotRequired[Optional[str]] |  |
-| `anthropic_api_key` | NotRequired[Optional[str]] |  |
-| `fireworks_api_key` | NotRequired[Optional[str]] |  |
-| `openai_api_base` | NotRequired[Optional[str]] |  |
-| `brave_api_key` | NotRequired[Optional[str]] |  |
-| `brave_search_endpoint` | NotRequired[Optional[str]] |  |
-| `brave_web_endpoint` | NotRequired[Optional[str]] |  |
-| `brave_summarizer_endpoint` | NotRequired[Optional[str]] |  |
-| `brave_news_endpoint` | NotRequired[Optional[str]] |  |
-| `searxng_url` | NotRequired[Optional[str]] |  |
-| `jina_api_key` | NotRequired[Optional[str]] |  |
-| `langsmith_api_key` | NotRequired[Optional[str]] |  |
-| `langsmith_project` | NotRequired[Optional[str]] |  |
-| `langsmith_endpoint` | NotRequired[Optional[str]] |  |
+| `openai_api_key` | `NotRequired[Optional[str]]` |  |
+| `anthropic_api_key` | `NotRequired[Optional[str]]` |  |
+| `fireworks_api_key` | `NotRequired[Optional[str]]` |  |
+| `openai_api_base` | `NotRequired[Optional[str]]` |  |
+| `brave_api_key` | `NotRequired[Optional[str]]` |  |
+| `brave_search_endpoint` | `NotRequired[Optional[str]]` |  |
+| `brave_web_endpoint` | `NotRequired[Optional[str]]` |  |
+| `brave_summarizer_endpoint` | `NotRequired[Optional[str]]` |  |
+| `brave_news_endpoint` | `NotRequired[Optional[str]]` |  |
+| `searxng_url` | `NotRequired[Optional[str]]` |  |
+| `jina_api_key` | `NotRequired[Optional[str]]` |  |
+| `langsmith_api_key` | `NotRequired[Optional[str]]` |  |
+| `langsmith_project` | `NotRequired[Optional[str]]` |  |
+| `langsmith_endpoint` | `NotRequired[Optional[str]]` |  |
 
 ## Class: DatabaseConfig
 
-Database configuration parameters.
+`Database` configuration parameters.
 
 ### Class Definition
 ```python
@@ -249,18 +248,18 @@ class DatabaseConfig(TypedDict, total=True):
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `qdrant_host` | NotRequired[Optional[str]] |  |
-| `qdrant_port` | NotRequired[Optional[int]] |  |
-| `qdrant_collection_name` | NotRequired[Optional[str]] |  |
-| `postgres_user` | NotRequired[Optional[str]] |  |
-| `postgres_password` | NotRequired[Optional[str]] |  |
-| `postgres_db` | NotRequired[Optional[str]] |  |
-| `postgres_host` | NotRequired[Optional[str]] |  |
-| `postgres_port` | NotRequired[Optional[int]] |  |
+| `qdrant_host` | `NotRequired[Optional[str]]` |  |
+| `qdrant_port` | `NotRequired[Optional[int]]` |  |
+| `qdrant_collection_name` | `NotRequired[Optional[str]]` |  |
+| `postgres_user` | `NotRequired[Optional[str]]` |  |
+| `postgres_password` | `NotRequired[Optional[str]]` |  |
+| `postgres_db` | `NotRequired[Optional[str]]` |  |
+| `postgres_host` | `NotRequired[Optional[str]]` |  |
+| `postgres_port` | `NotRequired[Optional[int]]` |  |
 
 ## Class: ProxyConfig
 
-Proxy configuration parameters.
+`Proxy` configuration parameters.
 
 ### Class Definition
 ```python
@@ -274,13 +273,13 @@ class ProxyConfig(TypedDict, total=True):
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `proxy_url` | NotRequired[Optional[str]] |  |
-| `proxy_username` | NotRequired[Optional[str]] |  |
-| `proxy_password` | NotRequired[Optional[str]] |  |
+| `proxy_url` | `NotRequired[Optional[str]]` |  |
+| `proxy_username` | `NotRequired[Optional[str]]` |  |
+| `proxy_password` | `NotRequired[Optional[str]]` |  |
 
 ## Class: AgentConfig
 
-Agent configuration parameters.
+`Agent` configuration parameters.
 
 ### Class Definition
 ```python
@@ -301,42 +300,42 @@ class AgentConfig(TypedDict, total=True):
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `agent_type` | NotRequired[Optional[AgentType]] |  |
-| `max_loops` | NotRequired[Optional[int]] |  |
-| `max_search_results` | NotRequired[Optional[int]] |  |
-| `max_info_tool_calls` | NotRequired[Optional[int]] |  |
-| `max_research_iterations` | NotRequired[Optional[int]] |  |
-| `max_validation_attempts` | NotRequired[Optional[int]] |  |
-| `prompt_templates` | NotRequired[Optional[Dict[AgentType, str]]] |  |
-| `extraction_schema` | NotRequired[Optional[Dict[str, Any]]] |  |
-| `validation_thresholds` | NotRequired[Optional[Dict[str, float]]] |  |
-| `market_data_sources` | NotRequired[Optional[List[str]]] |  |
+| `agent_type` | `NotRequired[Optional[AgentType]]` |  |
+| `max_loops` | `NotRequired[Optional[int]]` |  |
+| `max_search_results` | `NotRequired[Optional[int]]` |  |
+| `max_info_tool_calls` | `NotRequired[Optional[int]]` |  |
+| `max_research_iterations` | `NotRequired[Optional[int]]` |  |
+| `max_validation_attempts` | `NotRequired[Optional[int]]` |  |
+| `prompt_templates` | `NotRequired[Optional[Dict[AgentType, str]]]` |  |
+| `extraction_schema` | `NotRequired[Optional[Dict[str, Any]]]` |  |
+| `validation_thresholds` | `NotRequired[Optional[Dict[str, float]]]` |  |
+| `market_data_sources` | `NotRequired[Optional[List[str]]]` |  |
 
 ## Class: Configuration
 
-Central configuration model for agent operations.
+`Central` configuration model for agent operations.
 
-Represents all configurable aspects of the agent system with environment defaults.
+`Represents` all configurable aspects of the agent system with environment defaults.
 
 **Attributes:**
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `llm_config` | ModelConfig | Language model configuration. |
-| `api_config` | APIConfig | External service API credentials. |
-| `database_config` | DatabaseConfig | Database connection parameters. |
-| `proxy_config` | ProxyConfig | Network proxy settings. |
-| `agent_config` | AgentConfig | Agent behavior parameters. |
-| `rate_limits` | RateLimitConfig | Rate limiting configurations. |
-| `langgraph_log_level` | int | Logging level for LangGraph components. |
+| `llm_config` | ``ModelConfig`` | `Language` model configuration. |
+| `api_config` | ``APIConfig`` | `External` service `API` credentials. |
+| `database_config` | ``DatabaseConfig`` | `Database` connection parameters. |
+| `proxy_config` | ``ProxyConfig`` | `Network` proxy settings. |
+| `agent_config` | ``AgentConfig`` | `Agent` behavior parameters. |
+| `rate_limits` | ``RateLimitConfig`` | `Rate` limiting configurations. |
+| `langgraph_log_level` | `int` | `Logging` level for `LangGraph` components. |
 
 **Notes:**
-    - Default values are populated from environment variables
-    - Contains separate configurations for different system aspects
-    - Validation methods ensure configuration integrity
-    - Implements two-level logging configuration:
-      1. Global application logging (configure_global_logging)
-      2. Instance-specific logging (configure_logging)
+    - `Default` values are populated from environment variables
+    - `Contains` separate configurations for different system aspects
+    - `Validation` methods ensure configuration integrity
+    - `Implements` two-level logging configuration:
+      1. `Global` application logging (configure_global_logging)
+      2. `Instance`-specific logging (configure_logging)
 
 ### Class Definition
 ```python
@@ -354,13 +353,13 @@ class Configuration(TypedDict, total=False):
 
 | Attribute | Type | Description |
 | --- | --- | --- |
-| `llm_config` | ModelConfig | Language model configuration. |
-| `api_config` | APIConfig | External service API credentials. |
-| `database_config` | DatabaseConfig | Database connection parameters. |
-| `proxy_config` | ProxyConfig | Network proxy settings. |
-| `agent_config` | AgentConfig | Agent behavior parameters. |
-| `rate_limits` | RateLimitConfig | Rate limiting configurations. |
-| `langgraph_log_level` | int | Logging level for LangGraph components. |
+| `llm_config` | `ModelConfig` | Language model configuration. |
+| `api_config` | `APIConfig` | External service API credentials. |
+| `database_config` | `DatabaseConfig` | Database connection parameters. |
+| `proxy_config` | `ProxyConfig` | Network proxy settings. |
+| `agent_config` | `AgentConfig` | Agent behavior parameters. |
+| `rate_limits` | `RateLimitConfig` | Rate limiting configurations. |
+| `langgraph_log_level` | `int` | Logging level for LangGraph components. |
 
 ## Function: validate_api_config
 
@@ -368,7 +367,8 @@ class Configuration(TypedDict, total=False):
 def validate_api_config(api_config) -> None
 ```
 
-Validate API configuration integrity.
+`Validate` `API` configuration integrity.
+
 
 **Args:**
 
@@ -377,18 +377,18 @@ Validate API configuration integrity.
 
 **Raises:**
 
-    ValueError: For empty required API credentials
-    ConfigurationException: For missing critical API configuration
+    `ValueError`: For empty required `API` credentials
+    `ConfigurationException`: For missing critical `API` configuration
     
-Checks performed:
-    - Presence of required API keys
-    - Non-empty values for critical credentials
-    - Valid combinations of API parameters
-    - Warns about missing optional credentials
+`Checks` performed:
+    - `Presence` of required `API` keys
+    - `Non`-empty values for critical credentials
+    - `Valid` combinations of `API` parameters
+    - `Warns` about missing optional credentials
 
 **Parameters:**
 
-- `api_config` (APIConfig)
+- `api_config` (`APIConfig`)
 
 **Returns:**
 
@@ -400,7 +400,8 @@ Checks performed:
 def validate_proxy_config(proxy_config) -> None
 ```
 
-Validate proxy configuration.
+`Validate` proxy configuration.
+
 
 **Args:**
 
@@ -409,12 +410,12 @@ Validate proxy configuration.
 
 **Effects:**
 
-    - Logs success message when proxy URL is configured
-    - Warns about partial proxy credentials
+    - `Logs` success message when proxy `URL` is configured
+    - `Warns` about partial proxy credentials
 
 **Parameters:**
 
-- `proxy_config` (ProxyConfig)
+- `proxy_config` (`ProxyConfig`)
 
 **Returns:**
 
@@ -426,7 +427,8 @@ Validate proxy configuration.
 def validate_agent_config(agent_config) -> None
 ```
 
-Validate agent configuration limits.
+`Validate` agent configuration limits.
+
 
 **Args:**
 
@@ -435,16 +437,16 @@ Validate agent configuration limits.
 
 **Raises:**
 
-    ValueError: When configuration values are invalid
+    `ValueError`: When configuration values are invalid
     
 
 **Checks:**
 
-    - Positive values for max_loops and other limit parameters
+    - `Positive` values for max_loops and other limit parameters
 
 **Parameters:**
 
-- `agent_config` (AgentConfig)
+- `agent_config` (`AgentConfig`)
 
 **Returns:**
 
@@ -456,24 +458,25 @@ Validate agent configuration limits.
 def create_default_configuration() -> Configuration
 ```
 
-Create configuration with environment-derived defaults.
+`Create` configuration with environment-derived defaults.
+
 
 **Returns:**
 
     `Configuration`: Populated configuration dictionary
     
 
+**Process:**
+
+    1. `Retrieves` environment variables
+    2. `Sets` default values for missing parameters
+    3. `Validates` critical configuration sections
+    4. `Applies` system-safe default limits
+    
+
 **Note:**
 
     Uses `get_*` functions from settings.py to retrieve values
-
-**Process:**
-
-    1. Retrieves environment variables
-    2. Sets default values for missing parameters
-    3. Validates critical configuration sections
-    4. Applies system-safe default limits
-    
 
 **Returns:**
 
@@ -485,7 +488,8 @@ Create configuration with environment-derived defaults.
 def configure_logging(config) -> None
 ```
 
-Configure logging for the given configuration.
+`Configure` logging for the given configuration.
+
 
 **Args:**
 
@@ -494,13 +498,13 @@ Configure logging for the given configuration.
 
 **Effects:**
 
-    - Sets logging levels for specific loggers
-    - Applies langgraph_log_level from configuration
-    - Configures httpx and langchain loggers
+    - `Sets` logging levels for specific loggers
+    - `Applies` langgraph_log_level from configuration
+    - `Configures` httpx and langchain loggers
 
 **Parameters:**
 
-- `config` (Configuration)
+- `config` (`Configuration`)
 
 **Returns:**
 
@@ -512,7 +516,8 @@ Configure logging for the given configuration.
 def setup_proxy(config) -> None
 ```
 
-Configure proxy settings for specific tools.
+`Configure` proxy settings for specific tools.
+
 
 **Args:**
 
@@ -521,12 +526,12 @@ Configure proxy settings for specific tools.
 
 **Effects:**
 
-    - Prepares proxy settings for tool usage
-    - Logs warnings when proxy configuration is incomplete
+    - `Prepares` proxy settings for tool usage
+    - `Logs` warnings when proxy configuration is incomplete
 
 **Parameters:**
 
-- `config` (Configuration)
+- `config` (`Configuration`)
 
 **Returns:**
 
@@ -538,7 +543,8 @@ Configure proxy settings for specific tools.
 def get_formatted_proxy_url(proxy_config) -> Optional[str]
 ```
 
-Get formatted proxy URL with credentials if available.
+`Get` formatted proxy `URL` with credentials if available.
+
 
 **Args:**
 
@@ -555,7 +561,7 @@ Get formatted proxy URL with credentials if available.
 
 **Parameters:**
 
-- `proxy_config` (ProxyConfig)
+- `proxy_config` (`ProxyConfig`)
 
 **Returns:**
 
@@ -567,7 +573,8 @@ Get formatted proxy URL with credentials if available.
 def create_proxied_session(proxy_config, retries, backoff_factor, status_forcelist, pool_maxsize, pool_connections, timeout, verify_ssl) -> requests.Session
 ```
 
-Create a requests session with proxy configuration for tool usage.
+`Create` a requests session with proxy configuration for tool usage.
+
 
 **Args:**
 
@@ -587,14 +594,14 @@ Create a requests session with proxy configuration for tool usage.
 
 **Parameters:**
 
-- `proxy_config` (ProxyConfig)
-- `retries` (int)
-- `backoff_factor` (float)
-- `status_forcelist` (tuple[int, ...])
-- `pool_maxsize` (int)
-- `pool_connections` (int)
-- `timeout` (Union[float, tuple[float, float]])
-- `verify_ssl` (bool)
+- `proxy_config` (`ProxyConfig`)
+- `retries` (`int`)
+- `backoff_factor` (`float`)
+- `status_forcelist` (`tuple[int, ...]`)
+- `pool_maxsize` (`int`)
+- `pool_connections` (`int`)
+- `timeout` (`Union[float, tuple[float, float]]`)
+- `verify_ssl` (`bool`)
 
 **Returns:**
 
@@ -606,7 +613,8 @@ Create a requests session with proxy configuration for tool usage.
 def make_proxied_request(proxy_config, method, url, rate_limit_per_minute, session) -> requests.Response
 ```
 
-Make a proxied and rate-limited request for search/scraping tools.
+`Make` a proxied and rate-limited request for search/scraping tools.
+
 
 **Args:**
 
@@ -620,20 +628,20 @@ Make a proxied and rate-limited request for search/scraping tools.
 
 **Returns:**
 
-    requests.``Response``: ``Response`` object from the request
+    requests.`Response`: `Response` object from the request
     
 
 **Note:**
 
-    Creates a new session if none is provided
+    `Creates` a new session if none is provided
 
 **Parameters:**
 
-- `proxy_config` (ProxyConfig)
-- `method` (str)
-- `url` (str)
-- `rate_limit_per_minute` (int)
-- `session` (Optional[requests.Session])
+- `proxy_config` (`ProxyConfig`)
+- `method` (`str`)
+- `url` (`str`)
+- `rate_limit_per_minute` (`int`)
+- `session` (`Optional[requests.Session]`)
 
 **Returns:**
 
@@ -645,7 +653,8 @@ Make a proxied and rate-limited request for search/scraping tools.
 def create_proxied_tool(proxy_config, tool_func, rate_limit_per_minute) -> Callable[..., T]
 ```
 
-Create a proxied version of a tool function.
+`Create` a proxied version of a tool function.
+
 
 **Args:**
 
@@ -665,9 +674,9 @@ Create a proxied version of a tool function.
 
 **Parameters:**
 
-- `proxy_config` (ProxyConfig)
-- `tool_func` (Callable[..., T])
-- `rate_limit_per_minute` (int)
+- `proxy_config` (`ProxyConfig`)
+- `tool_func` (`Callable[..., T]`)
+- `rate_limit_per_minute` (`int`)
 
 **Returns:**
 
@@ -679,7 +688,8 @@ Create a proxied version of a tool function.
 def configure_global_logging(log_level, langgraph_log_level, other_loggers) -> None
 ```
 
-Configure root logging for the entire application.
+`Configure` root logging for the entire application.
+
 
 **Args:**
 
@@ -690,18 +700,18 @@ Configure root logging for the entire application.
 
 **Effects:**
 
-    - Sets root logger level
-    - Configures LangGraph-specific loggers
-    - Applies custom levels to specified loggers
-    - Initializes logging handlers
+    - `Sets` root logger level
+    - `Configures` `LangGraph`-specific loggers
+    - `Applies` custom levels to specified loggers
+    - `Initializes` logging handlers
     
-Should be called once at application startup.
+`Should` be called once at application startup.
 
 **Parameters:**
 
-- `log_level` (int)
-- `langgraph_log_level` (int)
-- `other_loggers` (Optional[Dict[str, int]])
+- `log_level` (`int`)
+- `langgraph_log_level` (`int`)
+- `other_loggers` (`Optional[Dict[str, int]]`)
 
 **Returns:**
 
@@ -713,7 +723,8 @@ Should be called once at application startup.
 def from_runnable_config(config) -> Configuration
 ```
 
-Create Configuration from a RunnableConfig instance.
+`Create` `Configuration` from a `RunnableConfig` instance.
+
 
 **Args:**
 
@@ -727,13 +738,13 @@ Create Configuration from a RunnableConfig instance.
 
 **Process:**
 
-    1. Extracts metadata from RunnableConfig
-    2. Maps configuration values to appropriate sections
-    3. Applies default values for missing parameters
+    1. `Extracts` metadata from `RunnableConfig`
+    2. `Maps` configuration values to appropriate sections
+    3. `Applies` default values for missing parameters
 
 **Parameters:**
 
-- `config` (Optional[RunnableConfig])
+- `config` (`Optional[RunnableConfig]`)
 
 **Returns:**
 
@@ -745,7 +756,8 @@ Create Configuration from a RunnableConfig instance.
 def validate_required_env_vars(config) -> None
 ```
 
-Validate that all required environment variables are set.
+`Validate` that all required environment variables are set.
+
 
 **Args:**
 
@@ -754,17 +766,17 @@ Validate that all required environment variables are set.
 
 **Raises:**
 
-    ConfigurationException: When required variables are missing
+    `ConfigurationException`: When required variables are missing
     
 
 **Checks:**
 
-    - Presence of critical API keys and endpoints
-    - Non-empty values for required configuration
+    - `Presence` of critical `API` keys and endpoints
+    - `Non`-empty values for required configuration
 
 **Parameters:**
 
-- `config` (Configuration)
+- `config` (`Configuration`)
 
 **Returns:**
 
@@ -776,22 +788,23 @@ Validate that all required environment variables are set.
 def from_env() -> Configuration
 ```
 
-Create a configuration from environment variables.
+`Create` a configuration from environment variables.
+
 
 **Returns:**
 
     `Configuration`: Populated configuration dictionary
     
 
+**Process:**
+
+    1. `Calls` create_default_configuration to build from environment
+    2. `Logs` success message
+    
+
 **Note:**
 
     This is a convenience wrapper around create_default_configuration
-
-**Process:**
-
-    1. Calls create_default_configuration to build from environment
-    2. Logs success message
-    
 
 **Returns:**
 

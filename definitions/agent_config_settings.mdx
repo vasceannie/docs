@@ -19,11 +19,10 @@ from dotenv import load_dotenv
 from agent.constants import BRAVE_NEWS_ENDPOINT, BRAVE_SEARCH_ENDPOINT, BRAVE_SUMMARIZER_ENDPOINT, BRAVE_WEB_ENDPOINT, DEFAULT_EXTRACTION_SCHEMA, DEFAULT_LANGSMITH_ENDPOINT, DEFAULT_LANGSMITH_PROJECT, DEFAULT_LLM_MAX_REQUESTS, DEFAULT_LLM_TIME_WINDOW, DEFAULT_LLM_TIMEOUT, DEFAULT_MARKET_DATA_SOURCES, DEFAULT_MAX_CONCURRENT_CONNECTIONS, DEFAULT_MAX_CONNECTIONS_PER_HOST, DEFAULT_MAX_CONTENT_CHARS, DEFAULT_MAX_INFO_TOOL_CALLS, DEFAULT_MAX_LOOPS, DEFAULT_MAX_NEWS_RESULTS, DEFAULT_MAX_RESEARCH_ITERATIONS, DEFAULT_MAX_SEARCH_RESULTS, DEFAULT_MAX_SUMMARIZER_RESULTS, DEFAULT_MAX_VALIDATION_ATTEMPTS, DEFAULT_MODEL_NAME, DEFAULT_POSTGRES_DB, DEFAULT_POSTGRES_HOST, DEFAULT_POSTGRES_PORT, DEFAULT_POSTGRES_USER, DEFAULT_QDRANT_COLLECTION_NAME, DEFAULT_QDRANT_HOST, DEFAULT_QDRANT_PORT, DEFAULT_TEMPERATURE, DEFAULT_TOOL_TIMEOUT, DEFAULT_VALIDATION_THRESHOLDS, DEFAULT_WEB_MAX_REQUESTS, DEFAULT_WEB_TIME_WINDOW, AgentType
 from agent.log_config import logger
 from agent.utils.logging import error_highlight, info_highlight, info_success, warning_highlight
-
 ```
 
 ## Description
-Environment and default settings.
+`Environment` and default settings.
 
 This module provides functionality for environment and default settings
 in the agent framework.
@@ -34,16 +33,17 @@ in the agent framework.
 def get_openai_api_key() -> str
 ```
 
-Retrieve OpenAI API key from environment.
+`Retrieve` `OpenAI` `API` key from environment.
 
-**Environment:**
-
-    `OPENAI_API_KEY`: Required API key
-    
 
 **Returns:**
 
     `str`: API key value or empty string
+    
+
+**Environment:**
+
+    `OPENAI_API_KEY`: Required API key
     
 
 **Logs:**
@@ -60,16 +60,17 @@ Retrieve OpenAI API key from environment.
 def get_openai_api_base() -> Optional[str]
 ```
 
-Get OpenAI API base URL from environment variables.
+`Get` `OpenAI` `API` base `URL` from environment variables.
 
-**Environment:**
-
-    `OPENAI_API_BASE_URL`: Optional API endpoint override
-    
 
 **Returns:**
 
     `str`: Base URL for OpenAI API or None
+    
+
+**Environment:**
+
+    `OPENAI_API_BASE_URL`: Optional API endpoint override
     
 
 **Logs:**
@@ -86,16 +87,17 @@ Get OpenAI API base URL from environment variables.
 def get_anthropic_api_key() -> str
 ```
 
-Get Anthropic API key from environment variables.
+`Get` `Anthropic` `API` key from environment variables.
 
-**Environment:**
-
-    `ANTHROPIC_API_KEY`: Optional API key
-    
 
 **Returns:**
 
     `str`: API key value or empty string
+    
+
+**Environment:**
+
+    `ANTHROPIC_API_KEY`: Optional API key
     
 
 **Logs:**
@@ -112,16 +114,17 @@ Get Anthropic API key from environment variables.
 def get_fireworks_api_key() -> str
 ```
 
-Get Fireworks API key from environment variables.
+`Get` `Fireworks` `API` key from environment variables.
 
-**Environment:**
-
-    `FIREWORKS_API_KEY`: Optional API key
-    
 
 **Returns:**
 
     `str`: API key value or empty string
+    
+
+**Environment:**
+
+    `FIREWORKS_API_KEY`: Optional API key
     
 
 **Logs:**
@@ -138,16 +141,17 @@ Get Fireworks API key from environment variables.
 def get_brave_api_key() -> str
 ```
 
-Get Brave API key from environment variables.
+`Get` `Brave` `API` key from environment variables.
 
-**Environment:**
-
-    `BRAVE_SEARCH_API_KEY`: Required API key
-    
 
 **Returns:**
 
     `str`: API key value or empty string
+    
+
+**Environment:**
+
+    `BRAVE_SEARCH_API_KEY`: Required API key
     
 
 **Logs:**
@@ -164,7 +168,13 @@ Get Brave API key from environment variables.
 def get_brave_search_endpoint() -> str
 ```
 
-Get Brave Search API endpoint.
+`Get` `Brave` `Search` `API` endpoint.
+
+
+**Returns:**
+
+    `str`: Configured endpoint or default constant
+    
 
 **Environment:**
 
@@ -173,12 +183,7 @@ Get Brave Search API endpoint.
 
 **Default:**
 
-    Uses `BRAVE_SEARCH_ENDPOINT` from constants
-
-**Returns:**
-
-    `str`: Configured endpoint or default constant
-    
+    `Uses` `BRAVE_SEARCH_ENDPOINT` from constants
 
 **Returns:**
 
@@ -190,7 +195,13 @@ Get Brave Search API endpoint.
 def get_brave_web_endpoint() -> str
 ```
 
-Get Brave web endpoint from environment variables.
+`Get` `Brave` web endpoint from environment variables.
+
+
+**Returns:**
+
+    `str`: Configured endpoint or default constant
+    
 
 **Environment:**
 
@@ -199,12 +210,7 @@ Get Brave web endpoint from environment variables.
 
 **Default:**
 
-    Uses `BRAVE_WEB_ENDPOINT` from constants
-
-**Returns:**
-
-    `str`: Configured endpoint or default constant
-    
+    `Uses` `BRAVE_WEB_ENDPOINT` from constants
 
 **Returns:**
 
@@ -216,7 +222,13 @@ Get Brave web endpoint from environment variables.
 def get_brave_summarizer_endpoint() -> str
 ```
 
-Get Brave summarizer endpoint from environment variables.
+`Get` `Brave` summarizer endpoint from environment variables.
+
+
+**Returns:**
+
+    `str`: Configured endpoint or default constant
+    
 
 **Environment:**
 
@@ -225,12 +237,7 @@ Get Brave summarizer endpoint from environment variables.
 
 **Default:**
 
-    Uses `BRAVE_SUMMARIZER_ENDPOINT` from constants
-
-**Returns:**
-
-    `str`: Configured endpoint or default constant
-    
+    `Uses` `BRAVE_SUMMARIZER_ENDPOINT` from constants
 
 **Returns:**
 
@@ -242,7 +249,13 @@ Get Brave summarizer endpoint from environment variables.
 def get_brave_news_endpoint() -> str
 ```
 
-Get Brave news endpoint from environment variables.
+`Get` `Brave` news endpoint from environment variables.
+
+
+**Returns:**
+
+    `str`: Configured endpoint or default constant
+    
 
 **Environment:**
 
@@ -251,12 +264,7 @@ Get Brave news endpoint from environment variables.
 
 **Default:**
 
-    Uses `BRAVE_NEWS_ENDPOINT` from constants
-
-**Returns:**
-
-    `str`: Configured endpoint or default constant
-    
+    `Uses` `BRAVE_NEWS_ENDPOINT` from constants
 
 **Returns:**
 
@@ -268,16 +276,17 @@ Get Brave news endpoint from environment variables.
 def get_searxng_url() -> str
 ```
 
-Get SearXNG URL from environment variables.
+`Get` `SearXNG` `URL` from environment variables.
 
-**Environment:**
-
-    `SEARXNG_URL`: Optional URL
-    
 
 **Returns:**
 
     `str`: URL value or empty string
+    
+
+**Environment:**
+
+    `SEARXNG_URL`: Optional URL
     
 
 **Logs:**
@@ -294,7 +303,13 @@ Get SearXNG URL from environment variables.
 def get_qdrant_host() -> str
 ```
 
-Retrieve Qdrant vector database host.
+`Retrieve` `Qdrant` vector database host.
+
+
+**Returns:**
+
+    `str`: Hostname/IP from environment or default
+    
 
 **Environment:**
 
@@ -307,11 +322,6 @@ Retrieve Qdrant vector database host.
 
 **Returns:**
 
-    `str`: Hostname/IP from environment or default
-    
-
-**Returns:**
-
 - str
 
 ## Function: get_qdrant_port
@@ -320,7 +330,13 @@ Retrieve Qdrant vector database host.
 def get_qdrant_port() -> int
 ```
 
-Get Qdrant port from environment variables.
+`Get` `Qdrant` port from environment variables.
+
+
+**Returns:**
+
+    `int`: Port number from environment or default
+    
 
 **Environment:**
 
@@ -333,11 +349,6 @@ Get Qdrant port from environment variables.
 
 **Returns:**
 
-    `int`: Port number from environment or default
-    
-
-**Returns:**
-
 - int
 
 ## Function: get_qdrant_collection_name
@@ -346,7 +357,13 @@ Get Qdrant port from environment variables.
 def get_qdrant_collection_name() -> str
 ```
 
-Get Qdrant collection name from environment variables.
+`Get` `Qdrant` collection name from environment variables.
+
+
+**Returns:**
+
+    `str`: Collection name from environment or default
+    
 
 **Environment:**
 
@@ -359,11 +376,6 @@ Get Qdrant collection name from environment variables.
 
 **Returns:**
 
-    `str`: Collection name from environment or default
-    
-
-**Returns:**
-
 - str
 
 ## Function: get_langsmith_api_key
@@ -372,16 +384,17 @@ Get Qdrant collection name from environment variables.
 def get_langsmith_api_key() -> str
 ```
 
-Get LangSmith API key from environment variables.
+`Get` `LangSmith` `API` key from environment variables.
 
-**Environment:**
-
-    `LANGSMITH_API_KEY`: Optional API key
-    
 
 **Returns:**
 
     `str`: API key value or empty string
+    
+
+**Environment:**
+
+    `LANGSMITH_API_KEY`: Optional API key
     
 
 **Logs:**
@@ -398,7 +411,13 @@ Get LangSmith API key from environment variables.
 def get_langsmith_project() -> str
 ```
 
-Get LangSmith project name.
+`Get` `LangSmith` project name.
+
+
+**Returns:**
+
+    `str`: Project name from environment or default
+    
 
 **Environment:**
 
@@ -411,11 +430,6 @@ Get LangSmith project name.
 
 **Returns:**
 
-    `str`: Project name from environment or default
-    
-
-**Returns:**
-
 - str
 
 ## Function: get_langsmith_endpoint
@@ -424,7 +438,13 @@ Get LangSmith project name.
 def get_langsmith_endpoint() -> str
 ```
 
-Get LangSmith endpoint from environment variables.
+`Get` `LangSmith` endpoint from environment variables.
+
+
+**Returns:**
+
+    `str`: Endpoint URL from environment or default
+    
 
 **Environment:**
 
@@ -437,11 +457,6 @@ Get LangSmith endpoint from environment variables.
 
 **Returns:**
 
-    `str`: Endpoint URL from environment or default
-    
-
-**Returns:**
-
 - str
 
 ## Function: get_postgres_user
@@ -450,7 +465,13 @@ Get LangSmith endpoint from environment variables.
 def get_postgres_user() -> str
 ```
 
-Get PostgreSQL user from environment variables.
+`Get` `PostgreSQL` user from environment variables.
+
+
+**Returns:**
+
+    `str`: Username from environment or default
+    
 
 **Environment:**
 
@@ -463,11 +484,6 @@ Get PostgreSQL user from environment variables.
 
 **Returns:**
 
-    `str`: Username from environment or default
-    
-
-**Returns:**
-
 - str
 
 ## Function: get_postgres_password
@@ -476,16 +492,17 @@ Get PostgreSQL user from environment variables.
 def get_postgres_password() -> str
 ```
 
-Retrieve PostgreSQL database password.
+`Retrieve` `PostgreSQL` database password.
 
-**Environment:**
-
-    `POSTGRES_PASSWORD`: Required for database access
-    
 
 **Returns:**
 
     `str`: Password value or empty string
+    
+
+**Environment:**
+
+    `POSTGRES_PASSWORD`: Required for database access
     
 
 **Logs:**
@@ -502,7 +519,13 @@ Retrieve PostgreSQL database password.
 def get_postgres_db() -> str
 ```
 
-Get PostgreSQL database from environment variables.
+`Get` `PostgreSQL` database from environment variables.
+
+
+**Returns:**
+
+    `str`: Database name from environment or default
+    
 
 **Environment:**
 
@@ -515,11 +538,6 @@ Get PostgreSQL database from environment variables.
 
 **Returns:**
 
-    `str`: Database name from environment or default
-    
-
-**Returns:**
-
 - str
 
 ## Function: get_postgres_host
@@ -528,7 +546,13 @@ Get PostgreSQL database from environment variables.
 def get_postgres_host() -> str
 ```
 
-Get PostgreSQL host from environment variables.
+`Get` `PostgreSQL` host from environment variables.
+
+
+**Returns:**
+
+    `str`: Hostname from environment or default
+    
 
 **Environment:**
 
@@ -541,11 +565,6 @@ Get PostgreSQL host from environment variables.
 
 **Returns:**
 
-    `str`: Hostname from environment or default
-    
-
-**Returns:**
-
 - str
 
 ## Function: get_postgres_port
@@ -554,7 +573,13 @@ Get PostgreSQL host from environment variables.
 def get_postgres_port() -> int
 ```
 
-Get PostgreSQL port from environment variables.
+`Get` `PostgreSQL` port from environment variables.
+
+
+**Returns:**
+
+    `int`: Port number from environment or default
+    
 
 **Environment:**
 
@@ -567,11 +592,6 @@ Get PostgreSQL port from environment variables.
 
 **Returns:**
 
-    `int`: Port number from environment or default
-    
-
-**Returns:**
-
 - int
 
 ## Function: get_proxy_url
@@ -580,16 +600,17 @@ Get PostgreSQL port from environment variables.
 def get_proxy_url() -> str
 ```
 
-Retrieve network proxy URL.
+`Retrieve` network proxy `URL`.
 
-**Environment:**
-
-    `PROXY_URL`: Full proxy URL
-    
 
 **Returns:**
 
     `str`: Proxy URL in format protocol://host:port
+    
+
+**Environment:**
+
+    `PROXY_URL`: Full proxy URL
     
 
 **Logs:**
@@ -606,16 +627,17 @@ Retrieve network proxy URL.
 def get_proxy_username() -> str
 ```
 
-Get proxy username from environment variables.
+`Get` proxy username from environment variables.
 
-**Environment:**
-
-    `OXYLABS_USERNAME`: Optional proxy username
 
 **Returns:**
 
     `str`: Username value or empty string
     
+
+**Environment:**
+
+    `OXYLABS_USERNAME`: Optional proxy username
 
 **Returns:**
 
@@ -627,16 +649,17 @@ Get proxy username from environment variables.
 def get_proxy_password() -> str
 ```
 
-Get proxy password from environment variables.
+`Get` proxy password from environment variables.
 
-**Environment:**
-
-    `OXYLABS_PASSWORD`: Optional proxy password
-    
 
 **Returns:**
 
     `str`: Password value or empty string
+    
+
+**Environment:**
+
+    `OXYLABS_PASSWORD`: Optional proxy password
     
 
 **Logs:**
@@ -653,16 +676,17 @@ Get proxy password from environment variables.
 def get_jina_api_key() -> str
 ```
 
-Retrieve Jina AI API credentials.
+`Retrieve` `Jina` `AI` `API` credentials.
 
-**Environment:**
-
-    `JINA_API_KEY`: Required for Jina services
-    
 
 **Returns:**
 
     `str`: API key or empty string
+    
+
+**Environment:**
+
+    `JINA_API_KEY`: Required for Jina services
     
 
 **Logs:**
