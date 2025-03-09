@@ -1,0 +1,26 @@
+# json_generator
+
+[code:agent/tools/generators/json_generator.py]
+
+## Content
+
+```python
+import json
+from typing import Any, Dict, List, Union
+
+from .base_generator import BaseGenerator
+
+
+class JSONGenerator(BaseGenerator):
+    """Generator for JSON documents.
+    
+    This class handles the generation of JSON files from various content types.
+    """
+    
+    def generate(self, content: Union[str, Dict, List], output_path: str, **kwargs: Any) -> Dict[str, Any]:
+        """Generate a JSON file.
+        
+        Args:
+            content: The content to include in the JSON file
+     ...
+```

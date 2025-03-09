@@ -1,0 +1,21 @@
+# human_feedback
+
+[code:agent/tools/human_feedback.py]
+
+## Content
+
+```python
+import asyncio
+from typing import Any, List, Optional
+
+from pydantic import Field
+
+from .base import BaseTool, ToolInput, ToolOutput
+
+
+class HumanFeedbackInput(ToolInput):
+    question: str = Field(..., description="Question to ask the human")
+    options: Optional[List[str]] = Field(default=None, description="Options for the human to choose from")
+    timeout: Optional[int] = Field(default=300, description="Timeout in seconds")
+    context: Optional[str] = Field(default=None, description="Conte...
+```

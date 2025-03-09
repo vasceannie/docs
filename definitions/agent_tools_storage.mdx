@@ -1,0 +1,29 @@
+# storage
+
+[code:agent/tools/storage.py]
+
+## Content
+
+```python
+"""Database and vector store functionality
+
+This module provides functionality for database and vector store functionality
+in the agent framework.
+"""
+from datetime import datetime
+from typing import Any, Dict, NotRequired, Optional, TypedDict, Union, cast
+
+from .base import BaseTool, ToolInput
+
+
+class StoreInput(TypedDict):
+    """Input for storing data."""
+    key: str
+    value: Any
+    metadata: NotRequired[Dict[str, Any]]
+    ttl: NotRequired[int]
+
+
+class StoreOutput(TypedDict):
+    """Outp...
+```

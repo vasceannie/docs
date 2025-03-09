@@ -1,0 +1,25 @@
+# feedback
+
+[code:agent/reflection/feedback.py]
+
+## Content
+
+```python
+"""Feedback incorporation
+
+This module provides functionality for feedback incorporation
+in the agent framework.
+"""
+from typing import Any, Callable, Dict, List, Optional
+
+from langchain_core.language_models import LanguageModelLike
+from langchain_core.messages import SystemMessage
+from langchain_core.prompts import ChatPromptTemplate
+from langgraph.graph import StateGraph
+
+from agent.reflection.evaluator import ReflectionState
+
+
+class FeedbackProcessor:
+    """Processes feedback and generates ...
+```

@@ -1,0 +1,24 @@
+# evaluator
+
+[code:agent/reflection/evaluator.py]
+
+## Content
+
+```python
+"""Output evaluation mechanisms
+
+This module provides functionality for output evaluation mechanisms
+in the agent framework.
+"""
+from typing import Annotated, Any, Dict, List, TypedDict
+
+from langchain_core.language_models import LanguageModelLike
+from langchain_core.messages import BaseMessage
+from langchain_core.prompts import ChatPromptTemplate
+from langgraph.graph.message import add_messages
+
+
+class ReflectionState(TypedDict):
+    """State for reflection evaluation."""
+    messages: Annotate...
+```

@@ -1,0 +1,32 @@
+# analysis
+
+[code:agent/nodes/analysis.py]
+
+## Content
+
+```python
+"""Analysis nodes
+
+This module provides functionality for analysis nodes
+in the agent framework.
+"""
+import asyncio
+import json
+from typing import Any, Dict
+
+import numpy as np
+import pandas as pd
+
+from ..core.state import AgentState
+from ..utils.logging import error_highlight
+
+
+async def formulate_analysis_plan(state: AgentState) -> Dict[str, Any]:
+    """Formulate a plan for analyzing the data.
+    
+    Args:
+        state: Current agent state with analysis task and data
+        
+    Returns:
+...
+```

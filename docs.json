@@ -67,24 +67,37 @@
           {
             "group": "Config",
             "pages": [
-              "definitions/agent_config___init__",
-              "definitions/agent_config_configuration",
-              "definitions/agent_config_settings"
+              "__init__.md",
+              "configuration.md",
+              "settings.md"
             ]
           },
           {
             "group": "Core",
             "pages": [
-              "definitions/agent_core___init__",
-              "definitions/agent_core_agent",
-              "definitions/agent_core_graph",
-              "definitions/agent_core_state"
+              "__init__.md",
+              "agent.md",
+              "graph.md",
+              "state.md"
             ]
           },
           {
             "group": "Tools",
             "pages": [
-              "definitions/agent_tools_base"
+              "base.md"
+            ]
+          },
+          {
+            "group": "Utils",
+            "pages": [
+              "async_utils.md",
+              "cache.md",
+              "company_extraction.md",
+              "error_handling.md",
+              "http.md",
+              "logging.md",
+              "proxy.md",
+              "retry_stats.md"
             ]
           }
         ]

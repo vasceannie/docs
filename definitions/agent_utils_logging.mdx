@@ -1,0 +1,25 @@
+# logging
+
+[code:agent/utils/logging.py]
+
+## Content
+
+```python
+"""Logging utilities.
+
+This module provides enhanced logging utilities and convenience methods
+for the agent framework. It builds upon the basic logging configuration
+defined in log_config.py.
+"""
+
+import logging
+from typing import Any, Dict, List, Optional, Union  # noqa: F401
+
+# Import the base logger from log_config
+from agent.log_config import logger
+
+
+# Convenience methods for formatted logging with Rich markup
+def info_success(message: str, *args: Any, **kwargs: Any) -> None:
+    """Log a ...
+```

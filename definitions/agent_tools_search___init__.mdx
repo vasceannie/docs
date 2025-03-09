@@ -1,0 +1,67 @@
+# __init__
+
+[code:agent/tools/search/__init__.py]
+
+## Description
+
+Web search functionality
+
+This module provides functionality for web search in the agent framework.
+
+Examples:
+    Basic usage with default search tool:
+    ```python
+    from agent.tools.search import SearchFactory, SearchInput
+    from agent.config.types import Configuration
+
+    # Create configuration with search settings
+    config = Configuration()
+
+    # Create a search tool based on available API keys
+    search_tool = SearchFactory.create_default_search(config=config)
+
+    # Create and run a search
+    search_input = SearchInput(query="latest developments in AI", num_results=5)
+    results = await search_tool.arun(search_input)
+
+    # Process results
+    for result in results.results:
+        print(f"Title: {result.title}")
+        print(f"URL: {result.url}")
+        print(f"Snippet: {result.snippet}")
+        print("---")
+    ```
+
+    Creating a composite search with fallback capability:
+    ```python
+    from agent.tools.search import SearchFactory
+    from agent.config.types import Configuration
+
+    # Create configuration
+    config = Configuration()
+
+    # Create a composite search tool with fallback
+    search_tool = SearchFactory.create_composite_search(
+        config=config,
+        include_brave=True,
+        include_jina=True,
+        fallback_strategy="sequential"
+    )
+
+    # The tool will try each provider in sequence until one succeeds
+    results = await search_tool.arun({"query": "quantum computing advances"})
+    ```
+
+    Selecting a specific search provider:
+    ```python
+    from agent.tools.search import get_search_tool
+    from agent.config.types import Configuration
+
+    config = Configuration()
+
+    # Get a specific provider
+    brave_search = get_search_tool(config, provider="brave")
+
+    # Or get the default (best available) provider
+    default_search = get_search_tool(config, provider="default")
+    ```

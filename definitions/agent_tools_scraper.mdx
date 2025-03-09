@@ -1,0 +1,27 @@
+# scraper
+
+[code:agent/tools/scraper.py]
+
+## Content
+
+```python
+"""Web scraping functionality
+
+This module provides functionality for web scraping functionality
+in the agent framework.
+"""
+from functools import wraps
+from typing import Dict, List, Optional
+
+import aiohttp
+from bs4 import BeautifulSoup
+from pydantic import Field, HttpUrl
+
+from .base import BaseTool, ToolInput, ToolOutput
+
+# Use a try/except block to handle potential import errors
+try:
+    from ..utils.retry_stats import track_retry
+except ImportError:
+    # Define a simple decorator if the re...
+```

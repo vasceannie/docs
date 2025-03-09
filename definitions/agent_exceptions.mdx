@@ -1,0 +1,25 @@
+# exceptions
+
+[code:agent/exceptions.py]
+
+## Content
+
+```python
+"""Exceptions for the agent."""
+
+import warnings
+from dataclasses import dataclass
+from typing import Any, Callable, List, Optional, Type  # noqa: F401
+from uuid import uuid4
+
+from agent.utils.logging import warning_highlight
+
+
+class BaseApplicationException(Exception):
+    """Define the base exception class for all application exceptions."""
+
+    DEFAULT_CODE = "ERROR"
+
+    def __init__(self, message: str, code: str = DEFAULT_CODE) -> None:
+        """Initialize a new BaseApplicationException i...
+```

@@ -1,0 +1,29 @@
+# qdrant
+
+[code:agent/services/qdrant.py]
+
+## Content
+
+```python
+"""Qdrant vector database service
+
+This module provides functionality for qdrant vector database service
+in the agent framework.
+"""
+import asyncio
+import threading
+from typing import Any, Dict, List, Optional
+
+from qdrant_client import QdrantClient
+from qdrant_client.http import models
+from qdrant_client.http.models import (
+    Distance,
+    FieldCondition,
+    Filter,
+    MatchValue,
+    VectorParams,
+)
+
+from ..config.settings import Settings
+from ..utils.logging import error_highlight, info_...
+```

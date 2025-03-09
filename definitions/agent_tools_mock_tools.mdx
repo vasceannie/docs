@@ -1,0 +1,22 @@
+# mock_tools
+
+[code:agent/tools/mock_tools.py]
+
+## Content
+
+```python
+from typing import Any, Dict, List, Optional
+
+
+class ToolExecutor:
+    def __init__(self, tools: Optional[List[Any]] = None) -> None:
+        self.tools = tools or []
+    
+    def invoke(self, *args: Any, **kwargs: Any) -> Dict[str, str]:
+        return {"output": "mocked result"}
+
+class ToolInvocation:
+    def __init__(self, name: str, input_value: Any) -> None:
+        self.name = name
+        self.input_value = input_value 
+```

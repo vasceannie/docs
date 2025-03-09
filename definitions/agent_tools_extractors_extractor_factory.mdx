@@ -1,0 +1,23 @@
+# extractor_factory
+
+[code:agent/tools/extractors/extractor_factory.py]
+
+## Content
+
+```python
+"""Factory for creating document extractors based on document format."""
+
+from typing import Dict
+
+from ...exceptions import DocumentProcessingError
+from .base_extractor import BaseExtractor
+from .csv_extractor import CSVExtractor
+from .pdf_extractor import PDFExtractor
+
+
+class ExtractorFactory:
+    """Factory for creating document extractors based on document format.
+    
+    This class maintains a registry of extractors for different document formats
+    and provides methods to get the appropr...
+```

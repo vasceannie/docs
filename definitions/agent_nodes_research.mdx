@@ -1,0 +1,26 @@
+# research
+
+[code:agent/nodes/research.py]
+
+## Content
+
+```python
+"""Research nodes
+
+This module provides functionality for research nodes
+in the agent framework.
+"""
+import json
+from typing import Any, Dict
+
+from ..core.state import AgentState
+from ..tools.scraper import ScraperInput, WebScraperTool
+from ..tools.search import BraveSearchTool, SearchInput
+from ..utils.extraction import extract_entities
+from ..utils.logging import get_logger
+
+logger = get_logger(__name__)
+
+async def create_search_query(state: AgentState) -> Dict[str, Any]:
+    """Create a searc...
+```

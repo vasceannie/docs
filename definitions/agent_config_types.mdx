@@ -1,0 +1,27 @@
+# types
+
+[code:agent/config/types.py]
+
+## Content
+
+```python
+"""Type definitions for configuration.
+
+This module contains TypedDict definitions and type variables
+used throughout the configuration system. These type definitions
+provide structure and type safety for configuration objects used
+in the agent framework.
+"""
+
+# Standard library imports
+from typing import TypedDict, TypeVar
+
+# Third-party imports
+from langchain_core.callbacks.base import (
+    BaseCallbackHandler,
+    BaseCallbackManager,
+)
+from typing_extensions import NotRequired
+
+# Define a t...
+```

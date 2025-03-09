@@ -1,0 +1,25 @@
+# team_supervisor
+
+[code:agent/supervisors/team_supervisor.py]
+
+## Content
+
+```python
+"""Multi-agent team coordination
+
+This module provides functionality for multi-agent team coordination
+in the agent framework.
+"""
+import asyncio
+import uuid
+from enum import Enum
+from typing import Any, Callable, Dict, Optional
+
+from langgraph.graph import StateGraph
+from pydantic import BaseModel, Field
+
+from ..subgraphs import analysis_flow, research_flow, validation_flow
+from ..utils.logging import get_logger
+from .orchestrator import Orchestrator
+from .task_manager import Task, TaskManager,...
+```

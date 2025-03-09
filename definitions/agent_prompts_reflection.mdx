@@ -1,0 +1,27 @@
+# reflection
+
+[code:agent/prompts/reflection.py]
+
+## Content
+
+```python
+"""Reflection and critique prompts.
+
+This module provides functionality for reflection and critique prompts
+in the agent framework.
+"""
+
+from typing import Final
+
+# Reflection prompt
+# Parameters:
+#   current_state: The current state of the agent
+#   validation_targets: List of targets to validate
+REFLECTION_PROMPT: Final[
+    str
+] = """You are a Reflection Agent responsible for validating research findings and preventing hallucinations.
+Your tasks include:
+
+1. Citation Validation
+- Check all U...
+```

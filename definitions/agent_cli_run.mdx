@@ -1,0 +1,29 @@
+# run
+
+[code:agent/cli/run.py]
+
+## Content
+
+```python
+"""CLI entry points.
+
+This module provides functionality for cli entry points
+in the agent framework.
+"""
+
+import asyncio
+from typing import Any, Dict  # noqa: F401
+
+from agent.config.types import Configuration
+from agent.core.graph import initialize_graph, invoke_graph
+from agent.core.state import initialize_agent_state
+
+
+async def main():
+    # Initialize configuration
+    config = Configuration()
+    config.configure_logging()
+
+    # Initialize and create the graph chain
+    initialize_graph(...
+```

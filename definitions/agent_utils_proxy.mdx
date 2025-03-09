@@ -1,0 +1,27 @@
+# proxy
+
+[code:agent/utils/proxy.py]
+
+## Content
+
+```python
+"""Proxy utilities for HTTP requests.
+
+This module provides functionality for creating proxied HTTP sessions,
+making proxied requests, and wrapping tool functions with proxy capabilities.
+"""
+
+# Standard library imports
+import functools
+from typing import Any, Callable, TypeVar
+
+# Third-party imports
+import requests
+
+# Local imports
+from agent.config.types import ProxyConfig
+from agent.exceptions import ConfigurationException
+from agent.utils.logging import error_highlight, info_success
+
+# Defin...
+```

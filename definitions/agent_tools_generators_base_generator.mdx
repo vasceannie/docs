@@ -1,0 +1,22 @@
+# base_generator
+
+[code:agent/tools/generators/base_generator.py]
+
+## Content
+
+```python
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Union
+
+
+class BaseGenerator(ABC):
+    """Base class for all document generators.
+    
+    This abstract class defines the interface that all document generators must implement.
+    Generators are responsible for creating documents in specific formats from
+    standardized content representations.
+    """
+    
+    @abstractmethod
+    def generate(self, content: Union[str, Dict, List], output_path: str, **kwargs: Any) -> Dict[...
+```

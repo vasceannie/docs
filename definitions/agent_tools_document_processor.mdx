@@ -1,0 +1,29 @@
+# document_processor
+
+[code:agent/tools/document_processor.py]
+
+## Content
+
+```python
+import contextlib
+import os
+from enum import Enum
+from typing import Any, Optional, Type, TypedDict
+
+# For dataframe handling
+
+# For PDF processing
+try:
+    from pypdf import PdfReader, PdfWriter
+except ImportError:
+    with contextlib.suppress(ImportError):
+        pass
+# For Office document processing
+try:
+    from docx import Document
+    from openpyxl import Workbook
+    from pptx import Presentation  # type: ignore[import]
+    HAS_OFFICE_SUPPORT = True
+except ImportError:
+    HAS_OFFICE_SUP...
+```

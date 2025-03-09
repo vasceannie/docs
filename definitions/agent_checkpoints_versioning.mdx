@@ -1,0 +1,28 @@
+# versioning
+
+[code:agent/checkpoints/versioning.py]
+
+## Content
+
+```python
+"""Graph version management
+
+This module provides functionality for graph version management
+in the agent framework.
+"""
+import uuid
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
+
+from langgraph.checkpoint import Checkpoint
+
+from ..utils.logging import get_logger
+from .persistence import get_checkpoint_store
+
+logger = get_logger(__name__)
+
+class CheckpointVersion:
+    """Represents a versioned checkpoint."""
+    
+    def __init__(self, step: int, timestamp: da...
+```

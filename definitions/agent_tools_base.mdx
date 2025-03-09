@@ -1,245 +1,33 @@
----
-title: 'agent/tools/base.py'
-description: 'API reference for agent/tools/base.py'
-sidebar_label: 'Base'
-icon: 'toolbox'
----
+# base
 
-# Base Module
+[code:agent/tools/base.py]
 
-## Imports
+## Content
 
 ```python
-# Original imports
-import json
-from abc import abstractmethod
-from typing import Any, Dict, List, Optional, Type, Union, TypedDict, runtime_checkable, Set, TYPE_CHECKING
-from typing_extensions import Protocol
-from langchain.tools import BaseTool as LCBaseTool
-```
-
-## Description
-`Base` tool classes and interfaces.
+"""Base tool classes and interfaces.
 
 This module provides functionality for base tool classes and interfaces
-in the agent framework for the `LangGraph` application.
+in the agent framework for the LangGraph application.
+"""
 
-## Class: ToolProtocol
+import json
+from abc import abstractmethod
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Type,
+    TypedDict,
+    Union,
+    runtime_checkable,
+)
 
-`Protocol` defining the required interface for tools.
+from langchain.tools import BaseTool as LCBaseTool
+from typing_extensions import Protocol
 
-### Class Definition
-```python
-class ToolProtocol(Protocol):
-    # Methods defined below
+# Import tools conditionally - avoid circular import
+try:
+    from lang...
 ```
-
-## Class: ToolInput
-
-`Base` class for tool inputs with required fields.
-
-This class serves as the foundation for all tool input models in the application.
-`Tool` input models define the expected parameters for each tool.
-
-`Note`: total=`True` enforces explicit optional fields in subclasses
-
-### Class Definition
-```python
-class ToolInput(TypedDict, total=True):
-```
-
-## Class: ToolOutput
-
-`Base` class for tool outputs with required fields.
-
-This class serves as the foundation for all tool output models in the application.
-`Tool` output models define the structure of the data returned by each tool.
-
-`Note`: total=`True` enforces explicit optional fields in subclasses
-
-### Class Definition
-```python
-class ToolOutput(TypedDict, total=True):
-    success: bool
-    result: str
-    error: Optional[str]
-```
-
-**Attributes:**
-
-| Attribute | Type | Description |
-| --- | --- | --- |
-| `success` | `bool` |  |
-| `result` | `str` |  |
-| `error` | `Optional[str]` |  |
-
-## Class: BaseTool
-
-`Base` class for all tools in the application.
-
-### Class Definition
-```python
-class BaseTool(LCBaseTool):
-    # Methods defined below
-```
-
-#### Method: _run
-
-Decorators:
-```python
-@abstractmethod
-```
-
-```python
-def _run(self, tool_input) -> ToolOutput
-```
-
-`Execute` the tool with validated `TypedDict` input.
-
-
-**Args:**
-
-    `tool_input`: The input for the tool, either as a string or ToolInput dict
-    **kwargs: `Additional` keyword arguments
-    
-
-**Returns:**
-
-    `ToolOutput` containing the result of the tool execution
-
-**Parameters:**
-
-- `tool_input` (`Union[str, ToolInput]`)
-
-#### Method: validate_input
-
-```python
-def validate_input(self, tool_input) -> Optional[str]
-```
-
-`Validate` the tool input matches the expected `TypedDict` structure.
-
-
-**Args:**
-
-    `tool_input`: Input to validate - can be string or dict
-    
-
-**Returns:**
-
-    `Optional` error message if validation fails, `None` if validation passes
-
-**Parameters:**
-
-- `tool_input` (`Union[str, Dict[str, Any]]`)
-
-#### Method: validate_output
-
-```python
-def validate_output(self, output) -> ToolOutput
-```
-
-`Validate` the output matches `ToolOutput` structure.
-
-
-**Args:**
-
-    `output`: The output dictionary to validate
-    
-
-**Returns:**
-
-    `Validated` `ToolOutput`
-    
-
-**Raises:**
-
-    `ValueError`: If the output doesn't match the expected structure
-
-**Parameters:**
-
-- `output` (`Dict[str, Any]`)
-
-## Class: ToolRegistry
-
-`Registry` for managing tools.
-
-### Class Definition
-```python
-class ToolRegistry():
-    # Methods defined below
-```
-
-#### Method: register
-
-```python
-def register(self, tool) -> None
-```
-
-`Register` a tool with the registry.
-
-
-**Args:**
-
-    `tool`: The tool to register
-    
-
-**Raises:**
-
-    `ValueError`: If a tool with the same name is already registered
-
-**Parameters:**
-
-- `tool` (`BaseTool`)
-
-**Returns:**
-
-- None
-
-#### Method: get
-
-```python
-def get(self, name) -> Optional[BaseTool]
-```
-
-`Get` a tool by name.
-
-
-**Args:**
-
-    `name`: The name of the tool to retrieve
-    
-
-**Returns:**
-
-    The tool if found, `None` otherwise
-
-**Parameters:**
-
-- `name` (`str`)
-
-#### Method: list_tools
-
-```python
-def list_tools(self) -> List[str]
-```
-
-`List` all registered tool names.
-
-
-**Returns:**
-
-    `List` of registered tool names
-
-#### Method: create_executor
-
-```python
-def create_executor(self) -> ToolExecutor
-```
-
-`Create` a tool executor for all registered tools.
-
-
-**Returns:**
-
-    `ToolExecutor` configured with all registered tools

@@ -1,0 +1,25 @@
+# txt_generator
+
+[code:agent/tools/generators/txt_generator.py]
+
+## Content
+
+```python
+import json
+from typing import Any, Dict, List, Union
+
+from .base_generator import BaseGenerator
+
+
+class TXTGenerator(BaseGenerator):
+    """Generator for plain text documents.
+    
+    This class handles the generation of plain text files from various content types.
+    """
+    
+    def generate(self, content: Union[str, Dict, List], output_path: str, **kwargs: Any) -> Dict[str, Any]:
+        """Generate a text file.
+        
+        Args:
+            content: The content to include in the text...
+```

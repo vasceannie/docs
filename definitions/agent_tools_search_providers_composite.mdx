@@ -1,0 +1,27 @@
+# composite
+
+[code:agent/tools/search/providers/composite.py]
+
+## Content
+
+```python
+"""Composite search provider implementation
+
+This module provides a composite search provider that can use multiple
+underlying search providers with fallback capabilities.
+"""
+
+import asyncio
+import time
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Union, cast
+
+from langchain.schema.runnable import RunnableConfig
+
+from agent.tools.base import BaseTool, ToolInput
+from agent.tools.search.base import (
+    SearchInput,
+    SearchOutput,
+    SearchProvider,
+    Sea...
+```

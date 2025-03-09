@@ -1,0 +1,28 @@
+# validation
+
+[code:agent/prompts/validation.py]
+
+## Content
+
+```python
+"""Validation-specific prompts.
+
+This module provides functionality for validation-specific prompts
+in the agent framework.
+"""
+
+from typing import Final
+
+# Validation base prompt
+VALIDATION_BASE_PROMPT: Final[
+    str
+] = """You are a Validation Agent for RFP market analysis.
+Your goal is to prevent hallucinations and ensure data quality.
+
+{VALIDATION_REQUIREMENTS}
+
+3. Content Validation
+   - Verify all required fields are populated
+   - Check for data consistency across sections
+   - Validate ...
+```

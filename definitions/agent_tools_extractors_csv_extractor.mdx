@@ -1,0 +1,27 @@
+# csv_extractor
+
+[code:agent/tools/extractors/csv_extractor.py]
+
+## Content
+
+```python
+import csv
+import os
+from typing import Any, Dict, List
+
+from .base_extractor import BaseExtractor
+
+
+class CSVExtractor(BaseExtractor):
+    """Extractor for CSV documents.
+    
+    This class handles the extraction of content and metadata from CSV files.
+    """
+    
+    def extract(self, file_path: str, params: Dict[str, Any]) -> List[Dict]:
+        """Extract data from a CSV file.
+        
+        Args:
+            file_path: Path to the CSV file
+            params: Parameters to control extra...
+```

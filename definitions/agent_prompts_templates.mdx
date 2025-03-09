@@ -1,0 +1,24 @@
+# templates
+
+[code:agent/prompts/templates.py]
+
+## Content
+
+```python
+"""Main prompt templates.
+
+This module provides functionality for main prompt templates
+in the agent framework.
+"""
+
+from typing import Final
+
+# Common validation template used across multiple prompts
+STRUCTURED_OUTPUT_VALIDATION: Final[str] = """CRITICAL: All responses MUST:
+1. Be valid JSON only - no additional text or comments
+2. Follow the exact schema provided
+3. Never return empty or null values
+4. Include all required fields
+5. Use proper data types (strings, numbers, arrays)
+6. Maintain ...
+```

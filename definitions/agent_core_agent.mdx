@@ -1,236 +1,26 @@
----
-title: 'agent/core/agent.py'
-description: 'API reference for agent/core/agent.py'
-sidebar_label: 'Agent'
-icon: 'cube'
----
+# agent
 
-# Agent Module
+[code:agent/core/agent.py]
 
-## Imports
+## Content
 
 ```python
-# Original imports
-import asyncio
-from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Generic, List, Optional, Protocol, TypeVar, Union, TypedDict
-from langchain_core.runnables import Runnable, RunnableConfig
-```
-
-## Description
-`Base` agent classes and interfaces for building autonomous agent systems.
+"""Base agent classes and interfaces for building autonomous agent systems.
 
 This module provides the foundational components for creating and managing agents 
-that process state through synchronous and asynchronous operations. `Implements`
-the core patterns from `LangChain`'s `Runnable` interface while adding agent-specific
+that process state through synchronous and asynchronous operations. Implements
+the core patterns from LangChain's Runnable interface while adding agent-specific
 functionality.
+"""
 
-## Class: AgentState
-
-`State` container for agent processing workflows.
-
-**Attributes:**
-
-| Attribute | Type | Description |
-| --- | --- | --- |
-| `state` | `dict[str, `Any`]` | `Primary` state data storage. `All` agent operations  should read from and write to this dictionary. |
-| `config` | `dict[str, `Any`], optional` | `Configuration` overrides that persist  through the agent's processing lifecycle. |
-
-
-### Class Definition
-```python
-class AgentState(TypedDict, total=False):
-    state: Dict[str, Any]
-    config: Optional[Dict[str, Any]]
+import asyncio
+from abc import ABC, abstractmethod
+from typing import (  # noqa: F401
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    List,
+    Optional,
+   ...
 ```
-
-**Attributes:**
-
-| Attribute | Type | Description |
-| --- | --- | --- |
-| `state` | `Dict[str, Any]` | Primary state data storage. All agent operations |
-| `config` | `Optional[Dict[str, Any]]` | Configuration overrides that persist |
-
-## Class: AgentInterface
-
-`Protocol` defining the core interface for agent implementations.
-
-`Implementations` must provide both synchronous and asynchronous processing
-methods to support flexible execution contexts.
-
-### Class Definition
-```python
-class AgentInterface(Protocol):
-    # Methods defined below
-```
-
-#### Method: process
-
-```python
-def process(self, state, config) -> AgentState
-```
-
-`Process` state synchronously and return updated state.
-
-
-**Args:**
-
-    `state`: Current state dictionary containing agent workspace data
-    `config`: Optional configuration overrides for this processing step
-    
-
-**Returns:**
-
-    `Updated` state dictionary reflecting processing results
-    
-
-**Raises:**
-
-    `AgentProcessingError`: For failures during state transformation
-
-**Parameters:**
-
-- `state` (`AgentState`)
-- `config` (`Optional[Dict[str, Any]]`)
-
-## Class: BaseAgent
-
-`Abstract` base class for agent implementations.
-
-`Provides` common infrastructure for:
-- `State` management
-- `Configuration` handling
-- `Synchronous`/asynchronous execution
-- `Agent` lifecycle management
-
-**Attributes:**
-
-| Attribute | Type | Description |
-| --- | --- | --- |
-| `name` | `str` | `Unique` identifier for the agent instance |
-| `config` | `dict[str, `Any`]` | `Persistent` configuration settings |
-
-**Example:**
-    class `MyAgent`(`BaseAgent`):
-        def process(self, state, config=`None`):
-            # `Implementation`
-            
-        async def aprocess(self, state, config=`None`):
-            # `Async` implementation
-
-### Class Definition
-```python
-class BaseAgent(ABC, Generic[T]):
-    # Methods defined below
-```
-
-#### Method: process
-
-Decorators:
-```python
-@abstractmethod
-```
-
-```python
-def process(self, state, config) -> AgentState
-```
-
-`Process` the current state and return an updated state.
-
-**Parameters:**
-
-- `state` (`AgentState`)
-- `config` (`Optional[Dict[str, Any]]`)
-
-**Returns:**
-
-- AgentState
-
-## Class: RunnableAgent
-
-`Agent` implementation wrapping `LangChain` `Runnable` components.
-
-`Enables` integration with `LangChain` ecosystem tools while maintaining
-agent system compatibility. `Handles` both sync and async execution
-of the underlying runnable.
-
-**Attributes:**
-
-| Attribute | Type | Description |
-| --- | --- | --- |
-| `runnable` | ``Runnable`` | `LangChain`-compatible executable component |
-
-
-### Class Definition
-```python
-class RunnableAgent(BaseAgent[T]):
-    # Methods defined below
-```
-
-#### Method: process
-
-```python
-def process(self, state, config) -> AgentState
-```
-
-`Process` the current state using the runnable and return an updated state.
-
-
-**Args:**
-
-    `state`: The current state dictionary.
-    `config`: Optional configuration for processing.
-
-
-**Returns:**
-
-    `Updated` state dictionary.
-
-**Parameters:**
-
-- `state` (`AgentState`)
-- `config` (`Optional[Dict[str, Any]]`)
-
-## Class: FunctionAgent
-
-`Agent` implementation wrapping arbitrary callable functions.
-
-`Provides` agent interface for standard `Python` functions and coroutines.
-`Supports` both synchronous and asynchronous execution contexts.
-
-**Attributes:**
-
-| Attribute | Type | Description |
-| --- | --- | --- |
-| `func` | ``Callable`` | `Function` to execute during processing |
-
-
-### Class Definition
-```python
-class FunctionAgent(BaseAgent[T]):
-    # Methods defined below
-```
-
-#### Method: process
-
-```python
-def process(self, state, config) -> AgentState
-```
-
-`Process` the current state using the function and return an updated state.
-
-
-**Args:**
-
-    `state`: The current state dictionary.
-    `config`: Optional configuration for processing.
-
-
-**Returns:**
-
-    `Updated` state dictionary.
-
-**Parameters:**
-
-- `state` (`AgentState`)
-- `config` (`Optional[Dict[str, Any]]`)

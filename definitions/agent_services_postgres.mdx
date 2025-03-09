@@ -1,0 +1,35 @@
+# postgres
+
+[code:agent/services/postgres.py]
+
+## Content
+
+```python
+"""PostgreSQL service.
+
+This module provides functionality for postgresql service
+in the agent framework.
+"""
+
+import json
+from typing import Any, Dict, List, Optional
+
+import asyncpg
+
+from agent.config.types import Configuration
+from agent.utils.logging import (
+    error_highlight,
+    info_success,
+)
+
+# Pool for database connections
+_pool = None
+
+
+async def initialize_db_pool():
+    """Initialize the database connection pool."""
+    global _pool
+
+    if _pool is not None:
+        return _pool...
+```

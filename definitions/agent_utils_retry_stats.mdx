@@ -1,0 +1,23 @@
+# retry_stats
+
+[code:agent/utils/retry_stats.py]
+
+## Content
+
+```python
+"""Retry statistics collection utilities.
+
+This module provides utilities for tracking and analyzing retry statistics,
+which can help identify bottlenecks and problematic API calls in production.
+It's designed to work with the enhanced async_retry decorator to collect
+metrics without introducing significant overhead.
+"""
+
+import asyncio
+import functools
+import time
+from collections import defaultdict, deque
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import...
+```

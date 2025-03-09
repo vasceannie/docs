@@ -1,0 +1,28 @@
+# analysis
+
+[code:agent/prompts/analysis.py]
+
+## Content
+
+```python
+"""Analysis-specific prompts.
+
+This module provides functionality for analysis-specific prompts
+in the agent framework.
+"""
+
+from typing import Final
+
+# Prompt for tool selection
+TOOL_SELECTION_PROMPT: Final[str] = (
+    """What information do we need to research about {current_topic}?"""
+)
+
+# Prompt for analysis of tool results
+ANALYSIS_PROMPT: Final[str] = """
+Based on the following research about {current_topic}, provide a comprehensive analysis:
+
+{formatted_results}
+
+Your analysis should inc...
+```

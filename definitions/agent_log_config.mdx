@@ -1,0 +1,27 @@
+# log_config
+
+[code:agent/log_config.py]
+
+## Content
+
+```python
+"""Module: log_config.py. This module provides logging configuration for the enrichment agent.
+
+-------------------------
+It includes functions for setting up and configuring loggers with rich formatting.
+"""
+
+# Standard library imports
+import logging
+import threading
+from typing import Optional  # noqa: F401
+
+# Third-party imports
+from rich.console import Console
+from rich.logging import RichHandler
+
+# Create console for rich output - use stderr for logs
+console = Console(stderr=True)
+
+# Loggin...
+```

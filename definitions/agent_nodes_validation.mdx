@@ -1,0 +1,28 @@
+# validation
+
+[code:agent/nodes/validation.py]
+
+## Content
+
+```python
+"""Validation nodes
+
+This module provides functionality for validation nodes
+in the agent framework.
+"""
+import asyncio
+import json
+import re
+from typing import Any, Dict
+
+from ..core.state import AgentState
+from ..tools.human_feedback import HumanFeedbackInput, HumanInTheLoopTool
+from ..utils.logging import get_logger
+
+logger = get_logger(__name__)
+
+async def generate_validation_criteria(state: AgentState) -> Dict[str, Any]:
+    """Generate validation criteria based on content type.
+    
+    Ar...
+```

@@ -1,0 +1,26 @@
+# factory
+
+[code:agent/tools/search/factory.py]
+
+## Content
+
+```python
+"""Search factory implementation
+
+This module provides a factory for creating search tools.
+"""
+
+import logging
+from typing import Dict, List, Optional, Type, cast
+
+from agent.config import Configuration
+from agent.tools.base import BaseTool
+from agent.tools.search.base import (
+    AbstractSearchTool,
+    SearchInput,
+    SearchProvider,
+)
+from agent.tools.search.providers.brave import BraveSearchTool
+from agent.tools.search.providers.composite import CompositeSearchTool
+from agent.tools.search...
+```

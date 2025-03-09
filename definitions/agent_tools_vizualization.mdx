@@ -1,0 +1,24 @@
+# vizualization
+
+[code:agent/tools/vizualization.py]
+
+## Content
+
+```python
+import base64
+import io
+from typing import Any, Dict, List, Literal, Optional, Union
+
+import matplotlib.pyplot as plt
+from pydantic import Field
+
+from .base import BaseTool, ToolInput, ToolOutput
+
+
+class VisualizationInput(ToolInput):
+    data: Union[List[Dict[str, Any]], Dict[str, List[Any]]] = Field(
+        ..., description="Data to visualize"
+    )
+    chart_type: str = Field(..., description="Type of chart (bar, line, scatter, pie, etc.)")
+    title: Optional[str] = Field(default=None, desc...
+```

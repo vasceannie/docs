@@ -1,0 +1,23 @@
+# generator_factory
+
+[code:agent/tools/generators/generator_factory.py]
+
+## Content
+
+```python
+"""Factory for creating document generators based on document format."""
+
+from typing import Dict
+
+from ...exceptions import DocumentProcessingError
+from .base_generator import BaseGenerator
+from .json_generator import JSONGenerator
+from .txt_generator import TXTGenerator
+
+
+class GeneratorFactory:
+    """Factory for creating document generators based on document format.
+    
+    This class maintains a registry of generators for different document formats
+    and provides methods to get the appro...
+```

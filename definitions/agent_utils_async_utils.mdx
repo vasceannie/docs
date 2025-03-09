@@ -1,0 +1,20 @@
+# async_utils
+
+[code:agent/utils/async_utils.py]
+
+## Content
+
+```python
+"""Async utilities for concurrency control, retry mechanisms, and rate limiting.
+
+This module provides functionality for asynchronous operations in the agent framework,
+including concurrency control, function conversion, retry mechanisms with exponential
+backoff, and rate limiting for API calls.
+
+Typical usage examples:
+    # Run multiple coroutines with concurrency limit
+    results = await gather_with_concurrency(5, *my_coroutines)
+
+    # Convert a synchronous function to asynchronous
+    asyn...
+```

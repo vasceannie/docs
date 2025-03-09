@@ -1,0 +1,27 @@
+# main
+
+[code:agent/nodes/main.py]
+
+## Content
+
+```python
+"""Main agent node
+
+This module provides functionality for main agent node
+in the agent framework.
+"""
+from typing import Any, Dict
+
+from ..core.state import AgentState
+from ..prompts.templates import MAIN_SYSTEM_PROMPT
+from ..tools.evaluator import ContentEvaluatorTool
+from ..tools.scraper import WebScraperTool
+from ..tools.search import BraveSearchTool
+from ..tools.storage import StorageTool
+from ..utils.logging import get_logger
+
+logger = get_logger(__name__)
+
+# Initialize tools
+def get_defau...
+```

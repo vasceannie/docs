@@ -1,0 +1,27 @@
+# visualize
+
+[code:agent/cli/visualize.py]
+
+## Content
+
+```python
+"""Command-line interface for codebase visualization.
+
+This module provides a command-line interface for visualizing the codebase
+relationships using the codebase_visualizer module.
+"""
+
+import argparse
+import os
+import sys
+from pathlib import Path
+
+from agent.utils.codebase_visualizer import visualize_codebase
+
+
+def main():
+    """Run the codebase visualization tool."""
+    parser = argparse.ArgumentParser(
+        description="Visualize the relationships between entities in the codebase."
+    ...
+```

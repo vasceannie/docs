@@ -1,0 +1,30 @@
+# simple_graph
+
+[code:agent/examples/simple_graph.py]
+
+## Content
+
+```python
+"""Simple graph example.
+
+This module demonstrates how to use the updated graph implementation
+with a simple example.
+"""
+
+import asyncio
+from typing import Annotated, Any, Dict, List
+
+from typing_extensions import TypedDict
+
+# Import the logger from log_config
+from src.agent.log_config import logger
+from src.agent.utils.logging import info_highlight, log_dict, log_step
+
+from ..core import (  # noqa: F401
+    END,
+    START,
+    FunctionAgent,
+    GraphBuilder,
+    StateManager,
+    add_to_list,...
+```

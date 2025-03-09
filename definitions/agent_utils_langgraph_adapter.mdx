@@ -1,0 +1,20 @@
+# langgraph_adapter
+
+[code:agent/utils/langgraph_adapter.py]
+
+## Content
+
+```python
+"""LangGraph Adapter
+
+This utility module provides adapter functions for using tools and custom models with LangGraph
+regardless of Pydantic version differences.
+
+Usage:
+    from agent.utils.langgraph_adapter import adapt_tool_for_langgraph
+    
+    # Create a model compatible with both Pydantic v1 and v2
+    from agent.utils.patch_pydantic import create_compatible_model
+    MyModel = create_compatible_model("MyModel", 
+                                     {"field1": (str, "Field description")})...
+```

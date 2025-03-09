@@ -1,0 +1,22 @@
+# base_extractor
+
+[code:agent/tools/extractors/base_extractor.py]
+
+## Content
+
+```python
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Union
+
+
+class BaseExtractor(ABC):
+    """Base class for all document extractors.
+    
+    This abstract class defines the interface that all document extractors must implement.
+    Extractors are responsible for parsing specific document formats and extracting
+    their contents into a standardized representation.
+    """
+    
+    @abstractmethod
+    def extract(self, file_path: str, params: Dict[str, Any]) -> Union[str, Dic...
+```

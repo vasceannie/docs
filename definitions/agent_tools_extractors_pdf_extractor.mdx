@@ -1,0 +1,29 @@
+# pdf_extractor
+
+[code:agent/tools/extractors/pdf_extractor.py]
+
+## Content
+
+```python
+import contextlib
+import os
+from typing import Any, Dict
+
+try:
+    from pypdf import PdfReader
+except ImportError:
+    with contextlib.suppress(ImportError):
+        from pypdf import PdfReader
+
+from ...utils.logging import warning_highlight
+from .base_extractor import BaseExtractor
+
+
+class PDFExtractor(BaseExtractor):
+    """Extractor for PDF documents.
+    
+    This class handles the extraction of content and metadata from PDF files.
+    """
+    
+    def extract(self, file_path: str, params: D...
+```

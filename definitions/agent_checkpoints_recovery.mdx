@@ -1,0 +1,27 @@
+# recovery
+
+[code:agent/checkpoints/recovery.py]
+
+## Content
+
+```python
+"""State recovery utilities
+
+This module provides functionality for state recovery utilities
+in the agent framework.
+"""
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
+
+from langgraph.checkpoint import Checkpoint
+
+from ..exceptions import RecoveryError
+from ..utils.logging import get_logger
+from .persistence import get_checkpoint_store
+
+logger = get_logger(__name__)
+
+class RecoveryManager:
+    """Manages recovery of workflows from failures or interruptions.
+   ...
+```
